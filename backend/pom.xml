@@ -199,7 +199,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/static/aas-registry-openapi.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/static/aas-registry-openapi2.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <generateSupportingFiles>true</generateSupportingFiles>
                             <packageName>org.eclipse.tractusx.semantics.aas.registry</packageName>

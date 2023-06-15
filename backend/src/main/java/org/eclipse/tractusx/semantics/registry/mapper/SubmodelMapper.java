@@ -20,31 +20,41 @@
 package org.eclipse.tractusx.semantics.registry.mapper;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
+import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
-@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface SubmodelMapper {
     @Mappings({
-            @Mapping(target="idExternal", source="identification"),
-            @Mapping(target="descriptions", source="description"),
+            @Mapping(target="idExternal", source="id"), // id == identification
+          @Mapping(target = "descriptions", source = "description"),
             @Mapping(target="semanticId", source = "semanticId")
     })
     Submodel fromApiDto(SubmodelDescriptor apiDto);
 
+   @Mapping(target = "text", ignore = true)
+   SubmodelDescription mapShellDescription (LangStringTextType description);
+
     @Mappings({
             @Mapping(target="interfaceName", source = "interface"),
-            @Mapping(target="endpointAddress", source = "protocolInformation.endpointAddress"),
+            @Mapping(target="endpointAddress", source = "protocolInformation.href"),   // "href" == "protocolInformation.endpointAddress"
             @Mapping(target="endpointProtocol", source = "protocolInformation.endpointProtocol"),
             @Mapping(target="endpointProtocolVersion", source = "protocolInformation.endpointProtocolVersion"),
             @Mapping(target="subProtocol", source = "protocolInformation.subprotocol"),
@@ -62,6 +72,7 @@ public interface SubmodelMapper {
     @InheritInverseConfiguration
     Endpoint toApiDto(SubmodelEndpoint apiDto);
 
+
     default String map(Reference reference){
         return reference != null && reference.getValue() != null && !reference.getValue().isEmpty() ? reference.getValue().get(0) : null;
     }
@@ -74,5 +85,7 @@ public interface SubmodelMapper {
         reference.setValue(List.of(semanticId));
         return reference;
     }
+
+
 
 }

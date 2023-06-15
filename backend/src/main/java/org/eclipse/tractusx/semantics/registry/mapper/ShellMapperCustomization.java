@@ -21,7 +21,7 @@ package org.eclipse.tractusx.semantics.registry.mapper;
 
 import com.google.common.base.Strings;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
+// import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
@@ -37,7 +37,7 @@ import java.util.Set;
  *
  */
 public class ShellMapperCustomization {
-
+/*
     public static Shell globalAssetIdToShellIdentifier(AssetAdministrationShellDescriptor apiDto, Shell shell){
         Optional<ShellIdentifier> shellIdentifierOptional = extractGlobalAssetId(apiDto.getGlobalAssetId());
         if(shellIdentifierOptional.isEmpty()) {
@@ -95,4 +95,6 @@ public class ShellMapperCustomization {
         }
         return Optional.of(new ShellIdentifier(null, ShellIdentifier.GLOBAL_ASSET_ID_KEY, globalAssetId, null, null));
     }
+
+ */
 }

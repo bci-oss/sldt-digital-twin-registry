@@ -22,7 +22,7 @@ package org.eclipse.tractusx.semantics.registry.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
+// import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,9 @@ import java.util.List;
  * This converter is required so that Spring is able to convert single query parameters to custom objects.
  */
 @Component
-public class IdentifierKeyValuePairConverter implements Converter<String, List<IdentifierKeyValuePair>> {
+public class IdentifierKeyValuePairConverter {
+    /*implements Converter<String, List<IdentifierKeyValuePair>>
+} {
 
     private final ObjectMapper objectMapper;
 
@@ -60,10 +62,12 @@ public class IdentifierKeyValuePairConverter implements Converter<String, List<I
      * SwaggerUI does weired encoding for user added items.
      * This method that SwaggerUI requests for lookups work.
      */
+    /*
     private static String removeLineBreaks(String source){
         return StringEscapeUtils
                 .unescapeJava(source).replace("\n", "").replace("\r", "")
                 .replace("\"{", "{")
                 .replace("}\"", "}");
     }
+    */
 }

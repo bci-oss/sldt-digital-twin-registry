@@ -20,6 +20,8 @@
 package org.eclipse.tractusx.semantics.registry.model;
 
 import lombok.Value;
+
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.data.annotation.Id;
 
 import java.util.UUID;
@@ -28,7 +30,6 @@ import java.util.UUID;
 public class ShellDescription {
     @Id
     UUID id;
-    String language;
     String text;
-
+    String language;
 }

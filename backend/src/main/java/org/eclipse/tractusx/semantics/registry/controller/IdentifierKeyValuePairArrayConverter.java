@@ -20,7 +20,7 @@
 package org.eclipse.tractusx.semantics.registry.controller;
 
 import org.springframework.core.convert.converter.Converter;
-import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
+//import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +32,10 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
-public class IdentifierKeyValuePairArrayConverter implements Converter<String[], List<IdentifierKeyValuePair>> {
+public class IdentifierKeyValuePairArrayConverter {
+    /*
+    implements Converter<String[], List<IdentifierKeyValuePair>>
+} {
 
     private final IdentifierKeyValuePairConverter singleConverter;
 
@@ -44,4 +47,6 @@ public class IdentifierKeyValuePairArrayConverter implements Converter<String[],
         }
         return result;
     }
+    */
+
 }

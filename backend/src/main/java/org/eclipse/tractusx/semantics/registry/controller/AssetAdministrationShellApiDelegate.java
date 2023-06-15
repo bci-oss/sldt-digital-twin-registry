@@ -20,14 +20,6 @@
 package org.eclipse.tractusx.semantics.registry.controller;
 
 import org.eclipse.tractusx.semantics.registry.service.ShellService;
-import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
-import org.eclipse.tractusx.semantics.aas.registry.api.RegistryApiDelegate;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptorCollection;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptorCollectionBase;
-import org.eclipse.tractusx.semantics.aas.registry.model.BatchResult;
-import org.eclipse.tractusx.semantics.aas.registry.model.IdentifierKeyValuePair;
-import org.eclipse.tractusx.semantics.aas.registry.model.ShellLookup;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.dto.BatchResultDto;
 import org.eclipse.tractusx.semantics.registry.mapper.ShellMapper;
@@ -47,7 +39,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class AssetAdministrationShellApiDelegate implements RegistryApiDelegate, LookupApiDelegate {
+public class AssetAdministrationShellApiDelegate {
+      /*implements RegistryApiDelegate, LookupApiDelegate {
+
 
     private final ShellService shellService;
     private final ShellMapper shellMapper;
@@ -177,5 +171,7 @@ public class AssetAdministrationShellApiDelegate implements RegistryApiDelegate,
         List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds));
         return new ResponseEntity<>(externalIds, HttpStatus.OK);
     }
+*/
+
 }
 

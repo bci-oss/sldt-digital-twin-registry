@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
 public class ShellMapperTest {
+
     private final ShellMapper mapper = new ShellMapperImpl(new SubmodelMapperImpl());
 
     @Test
@@ -227,4 +228,6 @@ public class ShellMapperTest {
                 .map(description -> tuple(description.getLanguage(), description.getText()))
                 .toArray(Tuple[]::new);
     }
+
+
 }
