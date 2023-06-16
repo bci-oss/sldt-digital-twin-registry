@@ -67,7 +67,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
       // TODO: the ErrorResponse classes are currently in the AAS api definition
       // we should move that out to a general api definition. Error response should be identical for all semantic layer
       // services.
-      return null;
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 //      return new ResponseEntity<>(
 //            new ErrorResponse()
 //            .error( new Error()
@@ -81,7 +81,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
          //public ResponseEntity<ErrorResponse> handleNotFoundException( final HttpServletRequest request,
          final RuntimeException exception ) {
-      return null;
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND );
 //      return new ResponseEntity<>( new ErrorResponse()
 //            .error( new Error()
 //                  .message( exception.getMessage() )
@@ -92,7 +92,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
    public ResponseEntity<Object> handleIllegalArgumentException( final HttpServletRequest request,
    //public ResponseEntity<ErrorResponse> handleIllegalArgumentException( final HttpServletRequest request,
          final IllegalArgumentException exception ) {
-      return null;
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 //      return new ResponseEntity<>( new ErrorResponse()
 //            .error( new Error()
 //                  .message( exception.getMessage() )
@@ -103,7 +103,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleMethodArgumentNotSupportedException( final HttpServletRequest request ) {
     //public ResponseEntity<ErrorResponse> handleMethodArgumentNotSupportedException( final HttpServletRequest request ) {
         String queryString = request.getQueryString();
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 //        return new ResponseEntity<>( new ErrorResponse()
 //                .error( new Error()
 //                        .message( String.format("The provided parameters are invalid. %s", URLDecoder.decode(queryString, StandardCharsets.UTF_8)) )
@@ -113,7 +113,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler( {DuplicateKeyException.class})
     public ResponseEntity<Object> handleDuplicateKeyException( final HttpServletRequest request, DuplicateKeyException e ) {
   //  public ResponseEntity<ErrorResponse> handleDuplicateKeyException( final HttpServletRequest request, DuplicateKeyException e ) {
-      return null;
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 //        return new ResponseEntity<>( new ErrorResponse()
 //                .error( new Error()
 //                        .message(DatabaseExceptionTranslation.translate( e ) )

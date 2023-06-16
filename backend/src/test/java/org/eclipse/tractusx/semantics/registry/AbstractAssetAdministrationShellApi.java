@@ -44,13 +44,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @EnableConfigurationProperties( RegistryProperties.class)
 public abstract class AbstractAssetAdministrationShellApi {
 
+//
+//    protected static final String SHELL_BASE_PATH = "/registry/shell-descriptors";
+//    protected static final String SINGLE_SHELL_BASE_PATH = "/registry/shell-descriptors/{shellIdentifier}";
+//    protected static final String LOOKUP_SHELL_BASE_PATH = "/lookup/shells";
+//    protected static final String SINGLE_LOOKUP_SHELL_BASE_PATH = "/lookup/shells/{shellIdentifier}";
+//    protected static final String SUB_MODEL_BASE_PATH = "/registry/shell-descriptors/{shellIdentifier}/submodel-descriptors";
+//    protected static final String SINGLE_SUB_MODEL_BASE_PATH = "/registry/shell-descriptors/{shellIdentifier}/submodel-descriptors/{submodelIdentifier}";
 
-    protected static final String SHELL_BASE_PATH = "/registry/shell-descriptors";
-    protected static final String SINGLE_SHELL_BASE_PATH = "/registry/shell-descriptors/{shellIdentifier}";
-    protected static final String LOOKUP_SHELL_BASE_PATH = "/lookup/shells";
-    protected static final String SINGLE_LOOKUP_SHELL_BASE_PATH = "/lookup/shells/{shellIdentifier}";
-    protected static final String SUB_MODEL_BASE_PATH = "/registry/shell-descriptors/{shellIdentifier}/submodel-descriptors";
-    protected static final String SINGLE_SUB_MODEL_BASE_PATH = "/registry/shell-descriptors/{shellIdentifier}/submodel-descriptors/{submodelIdentifier}";
+
+    protected static final String SHELL_BASE_PATH = "/api/v3.0/shell-descriptors";
+    protected static final String SINGLE_SHELL_BASE_PATH = "/api/v3.0/shell-descriptors/{shellIdentifier}";
+    protected static final String LOOKUP_SHELL_BASE_PATH = "/api/v3.0/lookup/shells";
+    protected static final String SINGLE_LOOKUP_SHELL_BASE_PATH = "/api/v3.0/lookup/shells/{shellIdentifier}";
+    protected static final String SUB_MODEL_BASE_PATH = "/api/v3.0/shell-descriptors/{shellIdentifier}/submodel-descriptors";
+    protected static final String SINGLE_SUB_MODEL_BASE_PATH = "/api/v3.0/shell-descriptors/{shellIdentifier}/submodel-descriptors/{submodelIdentifier}";
 
 
 

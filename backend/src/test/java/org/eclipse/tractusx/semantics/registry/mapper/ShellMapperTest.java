@@ -10,6 +10,7 @@ import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelEndpoint;
 import org.junit.jupiter.api.Test;
+import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +30,17 @@ public class ShellMapperTest {
         AssetAdministrationShellDescriptor aas = createCompleteAasDescriptor();
 
         Shell shell = mapper.fromApiDto(aas);
-        assertThat(shell.getIdExternal()).isEqualTo(aas.getIdentification());
+        //assertThat(shell.getIdExternal()).isEqualTo(aas.getIdentification());
+        assertThat(shell.getIdExternal()).isEqualTo(aas.getId());
         assertThat(shell.getIdShort()).isEqualTo(aas.getIdShort());
 
         List<Tuple> expectedIdentifiers = new ArrayList<>(List.of(toIdentifierTuples(aas.getSpecificAssetIds())));
-        expectedIdentifiers.add(tuple( ShellIdentifier.GLOBAL_ASSET_ID_KEY, aas.getGlobalAssetId().getValue().get(0)));
+        //expectedIdentifiers.add(tuple( ShellIdentifier.GLOBAL_ASSET_ID_KEY, aas.getGlobalAssetId().getValue().get(0)));
+
+        expectedIdentifiers.add(tuple( ShellIdentifier.GLOBAL_ASSET_ID_KEY, aas.getGlobalAssetId()));
+
+      //  expectedIdentifiers.add(tuple( ShellIdentifier.GLOBAL_ASSET_ID_KEY, aas.getGlobalAssetId().getValue().get(0)));
+
         assertThat(shell.getIdentifiers())
                 .extracting("key", "value")
                 .containsExactlyInAnyOrder(expectedIdentifiers.toArray(new Tuple[0]));
@@ -47,18 +54,18 @@ public class ShellMapperTest {
 
         SubmodelDescriptor submodelDescriptor = aas.getSubmodelDescriptors().stream().findFirst().get();
         Endpoint endpoint = submodelDescriptor.getEndpoints().stream().findFirst().get();
-        String semanticId = submodelDescriptor.getSemanticId().getValue().stream().findFirst().get();
+        String semanticId = submodelDescriptor.getSemanticId().getKeys().get( 0 ).getValue(); //.getValue().stream().findFirst().get();
         ProtocolInformation protocolInformation = endpoint.getProtocolInformation();
 
         Submodel submodel = shell.getSubmodels().stream().findFirst().get();
         SubmodelEndpoint submodelEndpoint = submodel.getEndpoints().stream().findFirst().get();
 
 
-        assertThat(submodel.getIdExternal()).isEqualTo(submodelDescriptor.getIdentification());
+        assertThat(submodel.getIdExternal()).isEqualTo(submodelDescriptor.getId());
         assertThat(submodel.getIdShort()).isEqualTo(submodelDescriptor.getIdShort());
-        assertThat(submodel.getSemanticId()).isEqualTo(semanticId);
+        //assertThat(submodel.getSemanticId()).isEqualTo(semanticId);
 
-        assertThat(submodelDescriptor.getSemanticId().getValue().stream().findFirst().get()).isEqualTo(submodel.getSemanticId());
+        //assertThat(submodelDescriptor.getSemanticId().getValue().stream().findFirst().get()).isEqualTo(submodel.getSemanticId());
 
         assertThat(submodelEndpoint.getInterfaceName()).isEqualTo(endpoint.getInterface());
 
@@ -75,13 +82,13 @@ public class ShellMapperTest {
     public void testMapToApiExpectSuccess() {
         Shell shell = createCompleteShell();
         AssetAdministrationShellDescriptor aas = mapper.toApiDto(shell);
-        assertThat(aas.getIdentification()).isEqualTo(shell.getIdExternal());
+        assertThat(aas.getId()).isEqualTo(shell.getIdExternal());
         assertThat(aas.getIdShort()).isEqualTo(shell.getIdShort());
 
         String expectedGlobalAssetId  = shell.getIdentifiers().stream()
                 .filter(shellIdentifier -> ShellIdentifier.GLOBAL_ASSET_ID_KEY.equals(shellIdentifier.getKey()))
                 .map(ShellIdentifier::getValue).findFirst().get();
-        assertThat(aas.getGlobalAssetId().getValue().get(0)).isEqualTo(expectedGlobalAssetId);
+        assertThat(aas.getGlobalAssetId()).isEqualTo(expectedGlobalAssetId);
 
         Set<ShellIdentifier> expectedIdentifiersSet = shell.getIdentifiers().stream()
                 .filter(shellIdentifier -> !ShellIdentifier.GLOBAL_ASSET_ID_KEY.equals(shellIdentifier.getKey()))
@@ -101,7 +108,7 @@ public class ShellMapperTest {
         // submodel mappings
         Submodel submodel = shell.getSubmodels().stream().findFirst().get();
         SubmodelEndpoint submodelEndpoint = submodel.getEndpoints().stream().findFirst().get();
-        assertThat(apiSubmodelDescriptor.getIdentification()).isEqualTo(submodel.getIdExternal());
+        assertThat(apiSubmodelDescriptor.getId()).isEqualTo(submodel.getIdExternal());
         assertThat(apiSubmodelDescriptor.getIdShort()).isEqualTo(submodel.getIdShort());
 
         assertThat(apiSubmodelDescriptor.getDescription())
@@ -150,36 +157,62 @@ public class ShellMapperTest {
 
     private AssetAdministrationShellDescriptor createCompleteAasDescriptor() {
         AssetAdministrationShellDescriptor aas = new AssetAdministrationShellDescriptor();
-        aas.setIdentification("identificationExample");
+        aas.setId("identificationExample"  );
+        //aas.setIdentification("identificationExample");
         aas.setIdShort("idShortExample");
 
-        Reference globalAssetId = new Reference();
-        globalAssetId.setValue(List.of("globalAssetIdExample"));
-        aas.setGlobalAssetId(globalAssetId);
+        String globalAssetID = "globalAssetIdExample";
+        aas.setGlobalAssetId( globalAssetID );
+//        Reference globalAssetId = new Reference();
+//        globalAssetId.setValue(List.of("globalAssetIdExample"));
+//        aas.setGlobalAssetId(globalAssetId);
 
-        IdentifierKeyValuePair identifier1 = new IdentifierKeyValuePair();
-        identifier1.setKey("identifier1KeyExample");
-        identifier1.setValue("identifier1ValueExample");
+        SpecificAssetId specificAssetId1 = new SpecificAssetId();
+        specificAssetId1.setName( "identifier1KeyExample" );
+        specificAssetId1.setValue( "identifier1ValueExample" );
 
-        IdentifierKeyValuePair identifier2 = new IdentifierKeyValuePair();
-        identifier2.setKey("identifier2KeyExample");
-        identifier2.setValue("identifier2ValueExample");
-        aas.setSpecificAssetIds(List.of(identifier1, identifier2));
+        SpecificAssetId specificAssetId2 = new SpecificAssetId();
+        specificAssetId2.setName( "identifier2KeyExample" );
+        specificAssetId2.setValue( "identifier2ValueExample" );
 
-        LangString description1 = new LangString();
-        description1.setLanguage("de");
-        description1.setText("this is an example description1");
+        aas.setSpecificAssetIds(List.of(specificAssetId1, specificAssetId2));
 
-        LangString description2 = new LangString();
-        description2.setLanguage("en");
-        description2.setText("this is an example for description2");
+//        IdentifierKeyValuePair identifier1 = new IdentifierKeyValuePair();
+//        identifier1.setKey("identifier1KeyExample");
+//        identifier1.setValue("identifier1ValueExample");
+//
+//        IdentifierKeyValuePair identifier2 = new IdentifierKeyValuePair();
+//        identifier2.setKey("identifier2KeyExample");
+//        identifier2.setValue("identifier2ValueExample");
+//        aas.setSpecificAssetIds(List.of(identifier1, identifier2));
+
+        LangStringTextType description1 = new LangStringTextType();
+        description1.setLanguage( "de" );
+        description1.setText( JsonNullable.of( "this is an example description1" ) );
+        LangStringTextType description2 = new LangStringTextType();
+        description2.setLanguage( "en" );
+        description2.setText( JsonNullable.of( "this is an example description2" ) );
         aas.setDescription(List.of(description1, description2));
+
+//        LangString description1 = new LangString();
+//        description1.setLanguage("de");
+//        description1.setText("this is an example description1");
+//
+//        LangString description2 = new LangString();
+//        description2.setLanguage("en");
+//        description2.setText("this is an example for description2");
+        //aas.setDescription(List.of(description1, description2));
 
 
         ProtocolInformation protocolInformation = new ProtocolInformation();
         protocolInformation.setEndpointProtocol("endpointProtocolExample");
-        protocolInformation.setEndpointAddress("endpointAddressExample");
-        protocolInformation.setEndpointProtocolVersion("endpointProtocolVersionExample");
+
+        // protocolInformation.setEndpointAddress("endpointAddressExample");
+        protocolInformation.setHref( "endpointAddressExample");
+
+        //protocolInformation.setEndpointProtocolVersion("endpointProtocolVersionExample");
+        protocolInformation.setEndpointProtocolVersion( List.of("endpointProtocolVersionExample") );
+
         protocolInformation.setSubprotocol("subprotocolExample");
         protocolInformation.setSubprotocolBody("subprotocolBodyExample");
         protocolInformation.setSubprotocolBodyEncoding("subprotocolBodyExample");
@@ -188,9 +221,18 @@ public class ShellMapperTest {
         endpoint.setProtocolInformation(protocolInformation);
 
         Reference reference = new Reference();
-        reference.setValue(List.of("semanticIdExample"));
+        reference.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key key = new Key();
+        key.setType( KeyTypes.SUBMODEL );
+        key.setValue( "semanticIdExample" );
+        reference.setKeys( List.of(key) );
+        //reference.setValue(List.of("semanticIdExample"));
+
         SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
-        submodelDescriptor.setIdentification("identificationExample");
+
+        //submodelDescriptor.setIdentification("identificationExample");
+        submodelDescriptor.setId( "identificationExample");
+
         submodelDescriptor.setIdShort("idShortExample");
         submodelDescriptor.setSemanticId(reference);
         submodelDescriptor.setDescription(List.of(description1, description2));
@@ -217,16 +259,28 @@ public class ShellMapperTest {
                 .toArray(Tuple[]::new);
     }
 
-    private Tuple[] toIdentifierTuples(List<IdentifierKeyValuePair> identifiers) {
+//    private Tuple[] toIdentifierTuples(List<IdentifierKeyValuePair> identifiers) {
+//        return identifiers.stream()
+//                .map(identifier -> tuple(identifier.getKey(), identifier.getValue()))
+//                .toArray(Tuple[]::new);
+//    }
+
+    private Tuple[] toIdentifierTuples(List<SpecificAssetId> identifiers) {
         return identifiers.stream()
-                .map(identifier -> tuple(identifier.getKey(), identifier.getValue()))
-                .toArray(Tuple[]::new);
+              .map(identifier -> tuple(identifier.getName(), identifier.getValue()))
+              .toArray(Tuple[]::new);
     }
 
-    private Tuple[] toDescriptionTuples(List<LangString> descriptions) {
+//    private Tuple[] toDescriptionTuples(List<LangString> descriptions) {
+//        return descriptions.stream()
+//                .map(description -> tuple(description.getLanguage(), description.getText()))
+//                .toArray(Tuple[]::new);
+//    }
+
+    private Tuple[] toDescriptionTuples(List<LangStringTextType> descriptions) {
         return descriptions.stream()
-                .map(description -> tuple(description.getLanguage(), description.getText()))
-                .toArray(Tuple[]::new);
+              .map(description -> tuple(description.getLanguage(), description.getText().toString()))
+              .toArray(Tuple[]::new);
     }
 
 

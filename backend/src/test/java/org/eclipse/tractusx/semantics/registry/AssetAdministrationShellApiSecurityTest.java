@@ -444,29 +444,29 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
     @DisplayName("Lookup Authorization Test")
     class LookupTest {
 
-        @Test
-        public void testRbacForLookupByAssetIds() throws Exception {
-            ArrayNode specificAssetIds = emptyArrayNode().add(specificAssetId("abc", "123"));
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .get(LOOKUP_SHELL_BASE_PATH)
-                                    .queryParam("assetIds",  toJson(specificAssetIds))
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.addTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
-
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .get(LOOKUP_SHELL_BASE_PATH)
-                                    .queryParam("assetIds",  toJson(specificAssetIds))
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.readTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isOk());
-        }
+//        @Test -> lookup
+//        public void testRbacForLookupByAssetIds() throws Exception {
+//            ArrayNode specificAssetIds = emptyArrayNode().add(specificAssetId("abc", "123"));
+//            mvc.perform(
+//                            MockMvcRequestBuilders
+//                                    .get(LOOKUP_SHELL_BASE_PATH)
+//                                    .queryParam("assetIds",  toJson(specificAssetIds))
+//                                    .accept(MediaType.APPLICATION_JSON)
+//                                    .with(jwtTokenFactory.addTwin())
+//                    )
+//                    .andDo(MockMvcResultHandlers.print())
+//                    .andExpect(status().isForbidden());
+//
+//            mvc.perform(
+//                            MockMvcRequestBuilders
+//                                    .get(LOOKUP_SHELL_BASE_PATH)
+//                                    .queryParam("assetIds",  toJson(specificAssetIds))
+//                                    .accept(MediaType.APPLICATION_JSON)
+//                                    .with(jwtTokenFactory.readTwin())
+//                    )
+//                    .andDo(MockMvcResultHandlers.print())
+//                    .andExpect(status().isOk());
+//        }
 
     }
 
@@ -474,83 +474,83 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
     @DisplayName("Custom AAS API Authorization Tests")
     class CustomAASApiTest {
 
-        @Test
-        public void testRbacCreateShellInBatch() throws Exception {
-            ObjectNode shell = createShell();
-            ArrayNode batchShellBody = emptyArrayNode().add(shell);
+//        @Test - we don't have batch until 3.1
+//        public void testRbacCreateShellInBatch() throws Exception {
+//            ObjectNode shell = createShell();
+//            ArrayNode batchShellBody = emptyArrayNode().add(shell);
+//
+//            mvc.perform(
+//                            MockMvcRequestBuilders
+//                                    .post(SHELL_BASE_PATH + "/batch")
+//                                    .accept(MediaType.APPLICATION_JSON)
+//                                    .contentType(MediaType.APPLICATION_JSON)
+//                                    .content(toJson(batchShellBody))
+//                                    .with(jwtTokenFactory.readTwin())
+//                    )
+//                    .andDo(MockMvcResultHandlers.print())
+//                    .andExpect(status().isForbidden());
+//
+//            mvc.perform(
+//                            MockMvcRequestBuilders
+//                                    .post(SHELL_BASE_PATH + "/batch")
+//                                    .accept(MediaType.APPLICATION_JSON)
+//                                    .contentType(MediaType.APPLICATION_JSON)
+//                                    .content(toJson(batchShellBody))
+//                                    .with(jwtTokenFactory.addTwin())
+//                    )
+//                    .andDo(MockMvcResultHandlers.print())
+//                    .andExpect(status().isCreated());
+//        }
 
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .post(SHELL_BASE_PATH + "/batch")
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(batchShellBody))
-                                    .with(jwtTokenFactory.readTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
+//        @Test -> /query is part of lookup
+//        public void testRbacForFindShellsWithAnyMatch() throws Exception {
+//            JsonNode anyMatchLookupPayload = mapper.createObjectNode().set("query", mapper.createObjectNode()
+//                    .set("assetIds", emptyArrayNode().add(specificAssetId("abc", "123")))
+//            );
+//            mvc.perform(
+//                            MockMvcRequestBuilders
+//                                    .post(LOOKUP_SHELL_BASE_PATH + "/query")
+//                                    .content(toJson(anyMatchLookupPayload))
+//                                    .contentType(MediaType.APPLICATION_JSON)
+//                                    .with(jwtTokenFactory.deleteTwin())
+//                    )
+//                    .andDo(MockMvcResultHandlers.print())
+//                    .andExpect(status().isForbidden());
+//
+//            mvc.perform(
+//                            MockMvcRequestBuilders
+//                                    .post(LOOKUP_SHELL_BASE_PATH + "/query")
+//                                    .content(toJson(anyMatchLookupPayload))
+//                                    .contentType(MediaType.APPLICATION_JSON)
+//                                    .with(jwtTokenFactory.readTwin())
+//                    )
+//                    .andDo(MockMvcResultHandlers.print())
+//                    .andExpect(status().isOk());
+//        }
 
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .post(SHELL_BASE_PATH + "/batch")
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(batchShellBody))
-                                    .with(jwtTokenFactory.addTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isCreated());
-        }
-
-        @Test
-        public void testRbacForFindShellsWithAnyMatch() throws Exception {
-            JsonNode anyMatchLookupPayload = mapper.createObjectNode().set("query", mapper.createObjectNode()
-                    .set("assetIds", emptyArrayNode().add(specificAssetId("abc", "123")))
-            );
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .post(LOOKUP_SHELL_BASE_PATH + "/query")
-                                    .content(toJson(anyMatchLookupPayload))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.deleteTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
-
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .post(LOOKUP_SHELL_BASE_PATH + "/query")
-                                    .content(toJson(anyMatchLookupPayload))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.readTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isOk());
-        }
-
-        @Test
-        public void testRbacForFetchShellsByIds() throws Exception {
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .post(SHELL_BASE_PATH + "/fetch")
-                                    .content(toJson(emptyArrayNode()))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.deleteTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isForbidden());
-
-            mvc.perform(
-                            MockMvcRequestBuilders
-                                    .post(SHELL_BASE_PATH + "/fetch")
-                                    .content(toJson(emptyArrayNode()))
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .with(jwtTokenFactory.readTwin())
-                    )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.items", hasSize(0)));
-        }
+//        @Test - don't have /fetch
+//        public void testRbacForFetchShellsByIds() throws Exception {
+//            mvc.perform(
+//                            MockMvcRequestBuilders
+//                                    .post(SHELL_BASE_PATH + "/fetch")
+//                                    .content(toJson(emptyArrayNode()))
+//                                    .contentType(MediaType.APPLICATION_JSON)
+//                                    .with(jwtTokenFactory.deleteTwin())
+//                    )
+//                    .andDo(MockMvcResultHandlers.print())
+//                    .andExpect(status().isForbidden());
+//
+//            mvc.perform(
+//                            MockMvcRequestBuilders
+//                                    .post(SHELL_BASE_PATH + "/fetch")
+//                                    .content(toJson(emptyArrayNode()))
+//                                    .contentType(MediaType.APPLICATION_JSON)
+//                                    .with(jwtTokenFactory.readTwin())
+//                    )
+//                    .andDo(MockMvcResultHandlers.print())
+//                    .andExpect(status().isOk())
+//                    .andExpect(jsonPath("$.items", hasSize(0)));
+//        }
     }
 
     /**

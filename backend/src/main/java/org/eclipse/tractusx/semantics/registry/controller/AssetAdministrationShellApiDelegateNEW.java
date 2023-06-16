@@ -30,6 +30,7 @@ import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationS
 import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
 import org.eclipse.tractusx.semantics.aas.registry.model.ServiceDescription;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.mapper.ShellMapper;
 import org.eclipse.tractusx.semantics.registry.mapper.SubmodelMapper;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
@@ -79,18 +80,31 @@ public class AssetAdministrationShellApiDelegateNEW implements DescriptionApiDel
     @Override
     // new
     public ResponseEntity<Void> deleteSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier ) {
-        return ShellDescriptorsApiDelegate.super.deleteSubmodelDescriptorByIdThroughSuperpath( aasIdentifier, submodelIdentifier );
+        String aasIdentifierID = Base64.getUrlEncoder().encodeToString( aasIdentifier );
+        String submodelIdentifierID = Base64.getUrlEncoder().encodeToString( submodelIdentifier );
+
+        shellService.deleteSubmodel(aasIdentifierID, submodelIdentifierID);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        //return ShellDescriptorsApiDelegate.super.deleteSubmodelDescriptorByIdThroughSuperpath( aasIdentifier, submodelIdentifier );
     }
 
     @Override
     public ResponseEntity<GetAssetAdministrationShellDescriptorsResult> getAllAssetAdministrationShellDescriptors( Integer limit, String cursor,
           AssetKind assetKind, String assetType ) {
-        return ShellDescriptorsApiDelegate.super.getAllAssetAdministrationShellDescriptors( limit, cursor, assetKind, assetType );
+        Integer page = 0 ;
+        Integer pageSize = 10;
+
+        return new ResponseEntity<>(shellMapper.toApiDto(shellService.findAllShells(page, pageSize)), HttpStatus.OK);
+       // return ShellDescriptorsApiDelegate.super.getAllAssetAdministrationShellDescriptors( limit, cursor, assetKind, assetType );
     }
 
     @Override
     // new
     public ResponseEntity<GetSubmodelDescriptorsResult> getAllSubmodelDescriptorsThroughSuperpath( byte[] aasIdentifier, Integer limit, String cursor ) {
+
+       // return not implemented
+
         return ShellDescriptorsApiDelegate.super.getAllSubmodelDescriptorsThroughSuperpath( aasIdentifier, limit, cursor );
     }
 
@@ -98,8 +112,7 @@ public class AssetAdministrationShellApiDelegateNEW implements DescriptionApiDel
     public ResponseEntity<AssetAdministrationShellDescriptor> getAssetAdministrationShellDescriptorById( byte[] aasIdentifier ) {
         String aasIdentifierID = Base64.getUrlEncoder().encodeToString( aasIdentifier );
         Shell saved = shellService.findShellByExternalId( aasIdentifierID );
-        //return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.OK);
-        return null;
+        return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.OK);
     }
 
     @Override
@@ -108,38 +121,30 @@ public class AssetAdministrationShellApiDelegateNEW implements DescriptionApiDel
         String assIdentifierID = Base64.getUrlEncoder().encodeToString( aasIdentifier );
         String submodelIdenifierID = Base64.getUrlEncoder().encodeToString( submodelIdentifier );
         Submodel submodel = shellService.findSubmodelByExternalId(assIdentifierID, submodelIdenifierID);
-        //return new ResponseEntity<>(submodelMapper.toApiDto(submodel), HttpStatus.OK);
-        return ShellDescriptorsApiDelegate.super.getSubmodelDescriptorByIdThroughSuperpath( aasIdentifier, submodelIdentifier );
+        return new ResponseEntity<>(submodelMapper.toApiDto(submodel), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<AssetAdministrationShellDescriptor> postAssetAdministrationShellDescriptor( AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
-
-
         Shell saved = shellService.save(shellMapper.fromApiDto(assetAdministrationShellDescriptor));
-        //return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.CREATED);
-        return ShellDescriptorsApiDelegate.super.postAssetAdministrationShellDescriptor( assetAdministrationShellDescriptor );
+        return new ResponseEntity<>(shellMapper.toApiDto(saved), HttpStatus.CREATED);
     }
 
     @Override
     // new
     public ResponseEntity<SubmodelDescriptor> postSubmodelDescriptorThroughSuperpath( byte[] aasIdentifier, SubmodelDescriptor submodelDescriptor ) {
         String assIdentifierID = Base64.getUrlEncoder().encodeToString( aasIdentifier );
-        //Submodel toBeSaved = submodelMapper.fromApiDto(submodelDescriptor);
-        //Submodel savedSubModel = shellService.save(assIdentifierID, toBeSaved);
-//        return new ResponseEntity<>(submodelMapper.toApiDto(savedSubModel), HttpStatus.CREATED);
-
-        return ShellDescriptorsApiDelegate.super.postSubmodelDescriptorThroughSuperpath( aasIdentifier, submodelDescriptor );
+        Submodel toBeSaved = submodelMapper.fromApiDto(submodelDescriptor);
+        Submodel savedSubModel = shellService.save(assIdentifierID, toBeSaved);
+        return new ResponseEntity<>(submodelMapper.toApiDto(savedSubModel), HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Void> putAssetAdministrationShellDescriptorById( byte[] aasIdentifier, AssetAdministrationShellDescriptor assetAdministrationShellDescriptor ) {
         String aasIdentifierID = Base64.getUrlEncoder().encodeToString( aasIdentifier );
-//        Shell shell = shellMapper.fromApiDto( assetAdministrationShellDescriptor );
-//        shellService.update( aasIdentifierID, shell.withIdExternal( aasIdentifierID ) );
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
-        return ShellDescriptorsApiDelegate.super.putAssetAdministrationShellDescriptorById( aasIdentifier, assetAdministrationShellDescriptor );
+        Shell shell = shellMapper.fromApiDto( assetAdministrationShellDescriptor );
+        shellService.update( aasIdentifierID, shell.withIdExternal( aasIdentifierID ) );
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
@@ -147,11 +152,10 @@ public class AssetAdministrationShellApiDelegateNEW implements DescriptionApiDel
     public ResponseEntity<Void> putSubmodelDescriptorByIdThroughSuperpath( byte[] aasIdentifier, byte[] submodelIdentifier, SubmodelDescriptor submodelDescriptor ) {
         String aasIdentifierID = Base64.getUrlEncoder().encodeToString( aasIdentifier );
         String submodelIdentifierID =  Base64.getUrlEncoder().encodeToString( submodelIdentifier );
-//        Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
-//        shellService.update( aasIdentifierID, submodelIdentifierID, submodel.withIdExternal( submodelIdentifierID ) );
-//        return new ResponseEntity<>( HttpStatus.NO_CONTENT );
+        Submodel submodel = submodelMapper.fromApiDto( submodelDescriptor );
+        shellService.update( aasIdentifierID, submodelIdentifierID, submodel.withIdExternal( submodelIdentifierID ) );
+        return new ResponseEntity<>( HttpStatus.NO_CONTENT );
 
-        return ShellDescriptorsApiDelegate.super.putSubmodelDescriptorByIdThroughSuperpath( aasIdentifier, submodelIdentifier, submodelDescriptor );
     }
 
 

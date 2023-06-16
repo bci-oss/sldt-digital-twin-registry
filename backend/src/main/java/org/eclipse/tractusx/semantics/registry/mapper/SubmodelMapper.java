@@ -20,8 +20,11 @@
 package org.eclipse.tractusx.semantics.registry.mapper;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
+import org.eclipse.tractusx.semantics.aas.registry.model.Key;
+import org.eclipse.tractusx.semantics.aas.registry.model.KeyTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
+import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
@@ -63,26 +66,59 @@ public interface SubmodelMapper {
     })
     SubmodelEndpoint fromApiDto(Endpoint apiDto);
 
-    @InheritInverseConfiguration
-    List<SubmodelDescriptor> toApiDto(Set<Submodel> shell);
+    //todo: protocolversion -> array to string
+   default String protocolVersion(List<String> versions){
+      if (versions.size() > 0){
+         return versions.get( 0 );
+      } else {
+         return null;
+      }
+   }
+
+
+
+
+
+
+//    @InheritInverseConfiguration
+//    List<SubmodelDescriptor> toApiDto(Set<Submodel> shell);
 
     @InheritInverseConfiguration
     SubmodelDescriptor toApiDto(Submodel shell);
 
+   @Mapping(target = "text", ignore = true)
+   LangStringTextType mapSubModelDescription (SubmodelDescription description);
+
     @InheritInverseConfiguration
     Endpoint toApiDto(SubmodelEndpoint apiDto);
 
+   @Mapping(target = "text", ignore = true)
+   default List<String>  protocolVersionDescriptor(String version){
+      return List.of(version);
+   }
 
-    default String map(Reference reference){
-        return reference != null && reference.getValue() != null && !reference.getValue().isEmpty() ? reference.getValue().get(0) : null;
-    }
 
+//    default String map(Reference reference){
+//
+//        return reference != null && reference.getValue() != null && !reference.getValue().isEmpty() ? reference.getValue().get(0) : null;
+//    }
+
+   default String map(Reference reference){
+
+      return reference != null && reference.getKeys().get( 0 ) != null && !reference.getKeys().get( 0 ).getValue().isEmpty() ? reference.getKeys().get( 0 ).getValue() : null;
+   }
+
+
+   // todo: implement types
     default Reference map(String semanticId){
         if(semanticId == null ||  semanticId.isBlank()) {
             return null;
         }
         Reference reference = new Reference();
-        reference.setValue(List.of(semanticId));
+        reference.setType( ReferenceTypes.EXTERNALREFERENCE );
+        Key key = new Key();
+        key.setValue( semanticId );
+        //reference.setValue(List.of(semanticId));
         return reference;
     }
 

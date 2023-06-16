@@ -72,7 +72,8 @@ springdoc:
     path: /
     urls:
      - name: AAS Registry API
-       url: /aas-registry-openapi.yaml
+       #url: /aas-registry-openapi.yaml
+       url: /aas-registry-openapi2.yaml
     oauth:
       use-pkce-with-authorization-code-grant: true
       # the scopes and client id will be prefilled in the swagger ui
