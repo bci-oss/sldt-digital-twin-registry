@@ -38,10 +38,17 @@ import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface SubmodelMapper {
@@ -66,18 +73,11 @@ public interface SubmodelMapper {
     })
     SubmodelEndpoint fromApiDto(Endpoint apiDto);
 
-    //todo: protocolversion -> array to string
-   default String protocolVersion(List<String> versions){
-      if (versions.size() > 0){
-         return versions.get( 0 );
-      } else {
-         return null;
-      }
-   }
-
-
-
-
+    //TODO:Change the data base column to List of String
+  //  @Named("endpointProtocolVersionMapping")
+    default String endpointProtocolVersion(List<String> endpointProtocolVersions) {
+       return Optional.ofNullable(endpointProtocolVersions).map(endpointPVs -> String.join(",", endpointPVs)).orElse(null);
+    }
 
 
 //    @InheritInverseConfiguration
@@ -92,9 +92,12 @@ public interface SubmodelMapper {
     @InheritInverseConfiguration
     Endpoint toApiDto(SubmodelEndpoint apiDto);
 
-   //@Mapping(target = "text", ignore = true)
+   @Mapping(target = "text", ignore = true)
    default List<String>  protocolVersionDescriptor(String version){
-      return List.of(version);
+      List<String> versions= Stream.of(version.split(","))
+            .map(String::trim)
+            .collect( Collectors.toList());
+      return versions;
    }
 
 
@@ -103,9 +106,14 @@ public interface SubmodelMapper {
 //        return reference != null && reference.getValue() != null && !reference.getValue().isEmpty() ? reference.getValue().get(0) : null;
 //    }
 
-   default String map(Reference reference){
-
-      return reference != null && reference.getKeys().get( 0 ) != null && !reference.getKeys().get( 0 ).getValue().isEmpty() ? reference.getKeys().get( 0 ).getValue() : null;
+   default String map(Reference reference) {
+      return Optional.ofNullable(reference).map(Reference::getKeys)
+            .map( Collection::stream)
+            .orElseGet( Stream::empty)
+            .map(Key::getValue)
+            .filter( Objects::nonNull)
+            .findFirst()
+            .orElse(null);
    }
 
 

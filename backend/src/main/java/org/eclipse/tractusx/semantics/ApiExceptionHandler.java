@@ -21,10 +21,11 @@ package org.eclipse.tractusx.semantics;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import jakarta.validation.ValidationException;
 import org.eclipse.tractusx.semantics.aas.registry.model.Message;
 import org.eclipse.tractusx.semantics.aas.registry.model.Result;
 import org.eclipse.tractusx.semantics.registry.model.support.DatabaseExceptionTranslation;
@@ -34,17 +35,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-//import org.eclipse.tractusx.semantics.aas.registry.model.Error;
-//import org.eclipse.tractusx.semantics.aas.registry.model.ErrorResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -55,70 +52,60 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
    protected ResponseEntity<Object> handleMethodArgumentNotValid( final MethodArgumentNotValidException ex,
          final HttpHeaders headers,
          final HttpStatusCode status, final WebRequest request ) {
-      final String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-      final Map<String, Object> errors = ex.getBindingResult()
-                                           .getFieldErrors()
-                                           .stream()
-                                           .collect( Collectors.toMap( FieldError::getField, e -> {
-                                              if ( null == e.getDefaultMessage() ) {
-                                                 return "null";
-                                              }
-                                              return e.getDefaultMessage();
-                                           } ) );
       // TODO: the ErrorResponse classes are currently in the AAS api definition
       // we should move that out to a general api definition. Error response should be identical for all semantic layer
       // services.
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//      return new ResponseEntity<>(
-//            new ErrorResponse()
-//            .error( new Error()
-//                  .message( "Validation failed." )
-//                  .details( errors )
-//                  .path( path ) ), HttpStatus.BAD_REQUEST );
+      List<Message> messages = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map( fieldError -> new Message()
+                  .code( fieldError.getField() )
+                  .messageType( Message.MessageTypeEnum.ERROR )
+                  .text( Optional.ofNullable( fieldError.getDefaultMessage() ).orElseGet( () -> "null" ) )
+            ).collect( Collectors.toList() );
+      return new ResponseEntity<>(
+            new Result().messages( messages ), HttpStatus.BAD_REQUEST );
    }
 
-   @ExceptionHandler( {  EntityNotFoundException.class  } )
+   @ExceptionHandler( { EntityNotFoundException.class } )
    public ResponseEntity<Object> handleNotFoundException( final HttpServletRequest request,
 
          //public ResponseEntity<ErrorResponse> handleNotFoundException( final HttpServletRequest request,
          final RuntimeException exception ) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND );
-//      return new ResponseEntity<>( new ErrorResponse()
-//            .error( new Error()
-//                  .message( exception.getMessage() )
-//                  .path( request.getRequestURI() ) ), HttpStatus.NOT_FOUND );
+      return new ResponseEntity<>(
+            new Result().messages( List.of( new Message().messageType( Message.MessageTypeEnum.ERROR ).text( exception.getMessage() ) ) ),
+            HttpStatus.NOT_FOUND );
    }
 
-   @ExceptionHandler( {IllegalArgumentException.class})
+   @ExceptionHandler( { IllegalArgumentException.class } )
+   @ResponseStatus( HttpStatus.BAD_REQUEST )
    public ResponseEntity<Object> handleIllegalArgumentException( final HttpServletRequest request,
-   //public ResponseEntity<ErrorResponse> handleIllegalArgumentException( final HttpServletRequest request,
+         //public ResponseEntity<ErrorResponse> handleIllegalArgumentException( final HttpServletRequest request,
          final IllegalArgumentException exception ) {
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//      return new ResponseEntity<>( new ErrorResponse()
-//            .error( new Error()
-//                  .message( exception.getMessage() )
-//                  .path( request.getRequestURI() ) ), HttpStatus.BAD_REQUEST );
+      return new ResponseEntity<>(
+            new Result().messages( List.of( new Message().messageType( Message.MessageTypeEnum.ERROR ).text( exception.getMessage() ) ) ),
+            HttpStatus.BAD_REQUEST );
    }
 
-    @ExceptionHandler( {MethodArgumentConversionNotSupportedException.class})
-    public ResponseEntity<Object> handleMethodArgumentNotSupportedException( final HttpServletRequest request ) {
-    //public ResponseEntity<ErrorResponse> handleMethodArgumentNotSupportedException( final HttpServletRequest request ) {
-        String queryString = request.getQueryString();
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        return new ResponseEntity<>( new ErrorResponse()
-//                .error( new Error()
-//                        .message( String.format("The provided parameters are invalid. %s", URLDecoder.decode(queryString, StandardCharsets.UTF_8)) )
-//                        .path( request.getRequestURI() ) ), HttpStatus.BAD_REQUEST );
-    }
+   @ExceptionHandler( { MethodArgumentConversionNotSupportedException.class } )
+   @ResponseStatus( HttpStatus.BAD_REQUEST )
+   public ResponseEntity<Object> handleMethodArgumentNotSupportedException( final HttpServletRequest request ) {
+      //public ResponseEntity<ErrorResponse> handleMethodArgumentNotSupportedException( final HttpServletRequest request ) {
+      String queryString = request.getQueryString();
+      return new ResponseEntity<>(
+            new Result().messages(
+                  List.of( new Message().messageType( Message.MessageTypeEnum.ERROR )
+                        .text( String.format( "The provided parameters are invalid. %s", URLDecoder.decode( queryString, StandardCharsets.UTF_8 ) ) ) ) ),
+            HttpStatus.BAD_REQUEST );
+   }
 
-    @ExceptionHandler( {DuplicateKeyException.class})
-    public ResponseEntity<Object> handleDuplicateKeyException( final HttpServletRequest request, DuplicateKeyException e ) {
-  //  public ResponseEntity<ErrorResponse> handleDuplicateKeyException( final HttpServletRequest request, DuplicateKeyException e ) {
-      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        return new ResponseEntity<>( new ErrorResponse()
-//                .error( new Error()
-//                        .message(DatabaseExceptionTranslation.translate( e ) )
-//                        .path( request.getRequestURI() ) ), HttpStatus.BAD_REQUEST );
-    }
+   @ExceptionHandler( { DuplicateKeyException.class } )
+   @ResponseStatus( HttpStatus.BAD_REQUEST )
+   public ResponseEntity<Object> handleDuplicateKeyException( final HttpServletRequest request, DuplicateKeyException e ) {
+      //  public ResponseEntity<ErrorResponse> handleDuplicateKeyException( final HttpServletRequest request, DuplicateKeyException e ) {
+      return new ResponseEntity<>(
+            new Result().messages( List.of( new Message().messageType( Message.MessageTypeEnum.ERROR ).text( DatabaseExceptionTranslation.translate( e ) ) ) ),
+            HttpStatus.BAD_REQUEST );
+   }
 
 }
