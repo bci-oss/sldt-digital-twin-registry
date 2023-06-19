@@ -672,8 +672,223 @@ paths:
                 $ref: '#/components/schemas/Result'
       x-semanticIds:
       - https://admin-shell.io/aas/API/Descriptor/GetDescription/3/0
+  /lookup/shells:
+    get:
+      tags:
+        - Registry and Discovery Interface
+      summary: Returns a list of Asset Administration Shell ids based on Asset identifier key-value-pairs. Only the Shell ids are returned when all provided key-value pairs match.
+      operationId: getAllAssetAdministrationShellIdsByAssetLink
+      parameters:
+        - name: assetIds
+          in: query
+          description: The key-value-pair of an Asset identifier
+          required: false
+          # The form style defined in the AAS API does not match with the provided example.
+          # the "content" is the correct way to accept json encoded query parameters
+          # style: form
+          # explode: true
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 10000
+                items:
+                  $ref: '#/components/schemas/SpecificAssetId'
+              examples:
+                complete:
+                  $ref: '#/components/examples/lookup-shells-by-aas-identifier-query'
+      responses:
+        "200":
+          description: Requested Asset Administration Shell ids
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 10000
+                items:
+                  $ref: '#/components/schemas/Identifier'
+              examples:
+                complete:
+                  $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
+      x-semanticIds:
+        - https://admin-shell.io/aas/API/GetAllAssetAdministrationShellIdsByAssetLink/1/0/RC02
+  /lookup/shells/{aasIdentifier}:
+    get:
+      tags:
+        - Registry and Discovery Interface
+      summary: Returns a list of Asset identifier key-value-pairs based on an Asset Administration Shell id to edit discoverable content
+      operationId: GetAllAssetLinksById
+      parameters:
+        - name: aasIdentifier
+          in: path
+          description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Requested Asset identifier key-value-pairs
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 10000
+                items:
+                  $ref: '#/components/schemas/SpecificAssetId'
+              examples:
+                complete:
+                  $ref: '#/components/examples/lookup-specific-asset-ids'
+      x-semanticIds:
+        - https://admin-shell.io/aas/API/GetAllAssetLinksById/1/0/RC02
+    post:
+      tags:
+        - Registry and Discovery Interface
+      summary: Creates all Asset identifier key-value-pair linked to an Asset Administration Shell to edit discoverable content
+      operationId: PostAllAssetLinksById
+      parameters:
+        - name: aasIdentifier
+          in: path
+          description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Asset identifier key-value-pairs
+        content:
+          application/json:
+            schema:
+              type: array
+              maxItems: 10000
+              items:
+                $ref: '#/components/schemas/SpecificAssetId'
+            examples:
+              complete:
+                $ref: '#/components/examples/lookup-specific-asset-ids'
+        required: true
+      responses:
+        "201":
+          description: Asset identifier key-value-pairs created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 10000
+                items:
+                  $ref: '#/components/schemas/SpecificAssetId'
+              examples:
+                complete:
+                  $ref: '#/components/examples/lookup-specific-asset-ids'
+      x-semanticIds:
+        - https://admin-shell.io/aas/API/PostAllAssetLinksById/1/0/RC02
+    delete:
+      tags:
+        - Registry and Discovery Interface
+      summary: Deletes all Asset identifier key-value-pair linked to an Asset Administration Shell to edit discoverable content
+      operationId: DeleteAllAssetLinksById
+      parameters:
+        - name: aasIdentifier
+          in: path
+          description: The Asset Administration Shell’s unique id (BASE64-URL-encoded)
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Asset identifier key-value-pairs deleted successfully
+      x-semanticIds:
+        - https://admin-shell.io/aas/API/DeleteAllAssetLinksById/1/0/RC02
+  /lookup/shells/query:
+    post:
+      tags:
+        - Registry and Discovery Interface
+      summary: Returns a list of Asset Administration Shell ids based on Asset identifier key-value-pairs.
+      operationId: PostQueryAllAssetAdministrationShellIds
+      requestBody:
+        description: Asset Administration Shell Descriptor object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShellLookup'
+        required: true
+      responses:
+        "200":
+          description: Requested Asset Administration Shell ids
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 10000
+                items:
+                  $ref: '#/components/schemas/Identifier'
+              examples:
+                complete:
+                  $ref: '#/components/examples/lookup-shells-by-aas-identifier-response'
 components:
   schemas:
+    ShellLookup:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: object
+          properties:
+            assetIds:
+              type: array
+              maxItems: 10000
+              items:
+                $ref: '#/components/schemas/SpecificAssetId'
+    Identifier:
+      type: string
+      minLength: 1
+      maxLength: 200
+    ModelReference:
+      required:
+        - keys
+      properties:
+        # not supported for Catena-X
+        #  referredSemanticId:
+        #   $ref: '#/components/schemas/Reference'
+        keys:
+          type: array
+          maxItems: 10000
+          items:
+            $ref: '#/components/schemas/Key'
+      # The code generator gets in issues, because it's somehow recursive. Reference has a reference ModelReference ..
+      #    allOf:
+      #    - $ref: '#/components/schemas/Reference'
+    KeyElements:
+      type: string
+      enum:
+        - AssetAdministrationShell
+        - AccessPermissionRule
+        - ConceptDescription
+        - Submodel
+        - AnnotatedRelationshipElement
+        - BasicEvent
+        - Blob
+        - Capability
+        - DataElement
+        - File
+        - Entity
+        - Event
+        - MultiLanguageProperty
+        - Operation
+        - Property
+        - Range
+        - ReferenceElement
+        - RelationshipElement
+        - SubmodelElement
+        - SubmodelElementList
+        - SubmodelElementStruct
+        - View
+        - FragmentReference
     AssetKind:
       type: string
       enum:
@@ -834,7 +1049,7 @@ components:
         value:
           maxLength: 2000
           minLength: 1
-          #    pattern: "^([\\t\\n\\r -퟿-�]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
+       #   pattern: "^([\\t\\n\\r -퟿-�]|\\ud800[\\udc00-\\udfff]|[\\ud801-\\udbfe][\\udc00-\\udfff]|\\udbff[\\udc00-\\udfff])*$"
           type: string
     KeyTypes:
       type: string
@@ -1341,3 +1556,29 @@ components:
       schema:
         type: string
         format: byte
+  examples:
+    lookup-shells-by-aas-identifier-query:
+      value:
+        [
+          {
+            "key": "globalAssetId",
+            "value": "urn:uuid:882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+          },
+          {
+            "key": "PartInstanceID",
+            "value": "24975539203421"
+          }
+        ]
+    lookup-specific-asset-ids:
+      value:
+        [
+          {
+            "key": "PartInstanceID",
+            "value": "24975539203421"
+          }
+        ]
+    lookup-shells-by-aas-identifier-response:
+      value:
+        [
+          "882fc530-b69b-4707-95f6-5dbc5e9baaa8"
+        ]

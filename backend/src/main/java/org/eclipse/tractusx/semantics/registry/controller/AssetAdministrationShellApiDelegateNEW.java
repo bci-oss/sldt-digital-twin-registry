@@ -19,21 +19,17 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.controller;
 
-import java.util.Base64;
-import java.util.Optional;
+import java.util.*;
 
 import org.eclipse.tractusx.semantics.aas.registry.api.DescriptionApiDelegate;
+import org.eclipse.tractusx.semantics.aas.registry.api.LookupApiDelegate;
 import org.eclipse.tractusx.semantics.aas.registry.api.ShellDescriptorsApiDelegate;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
-import org.eclipse.tractusx.semantics.aas.registry.model.AssetKind;
-import org.eclipse.tractusx.semantics.aas.registry.model.GetAssetAdministrationShellDescriptorsResult;
-import org.eclipse.tractusx.semantics.aas.registry.model.GetSubmodelDescriptorsResult;
-import org.eclipse.tractusx.semantics.aas.registry.model.ServiceDescription;
-import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.aas.registry.model.*;
 import org.eclipse.tractusx.semantics.registry.dto.ShellCollectionDto;
 import org.eclipse.tractusx.semantics.registry.mapper.ShellMapper;
 import org.eclipse.tractusx.semantics.registry.mapper.SubmodelMapper;
 import org.eclipse.tractusx.semantics.registry.model.Shell;
+import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.service.ShellService;
 import org.springframework.http.HttpStatus;
@@ -42,7 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.NativeWebRequest;
 
 @Service
-public class AssetAdministrationShellApiDelegateNEW implements DescriptionApiDelegate, ShellDescriptorsApiDelegate {
+public class AssetAdministrationShellApiDelegateNEW implements DescriptionApiDelegate, ShellDescriptorsApiDelegate, LookupApiDelegate {
 
     private final ShellService shellService;
     private final ShellMapper shellMapper;
@@ -158,6 +154,36 @@ public class AssetAdministrationShellApiDelegateNEW implements DescriptionApiDel
 
     }
 
+    @Override
+    public ResponseEntity<List<String>> getAllAssetAdministrationShellIdsByAssetLink(List<SpecificAssetId> assetIds
+    ) {
+        if (assetIds == null || assetIds.isEmpty()) {
+            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+        }
+        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByExactMatch(shellMapper.fromApiDto(assetIds));
+        return new ResponseEntity<>(externalIds, HttpStatus.OK);
+    }
+
+    @Override
+        public ResponseEntity<List<SpecificAssetId>> getAllAssetLinksById(String aasIdentifier) {
+            Set<ShellIdentifier> identifiers = shellService.findShellIdentifiersByExternalShellId(aasIdentifier);
+            return new ResponseEntity<>(shellMapper.toApiDto(identifiers), HttpStatus.OK);
+        }
+
+        @Override
+    public ResponseEntity<List<SpecificAssetId>> postAllAssetLinksById(String aasIdentifier, List<SpecificAssetId> specificAssetId) {
+        Set<ShellIdentifier> shellIdentifiers = shellService.save(aasIdentifier, shellMapper.fromApiDto(specificAssetId));
+        List<SpecificAssetId> list = shellMapper.toApiDto(shellIdentifiers);
+        return new ResponseEntity<>(list, HttpStatus.CREATED);
+    }
+
+
+    @Override
+    public ResponseEntity<List<String>> postQueryAllAssetAdministrationShellIds(ShellLookup shellLookup) {
+        List<SpecificAssetId> assetIds = shellLookup.getQuery().getAssetIds();
+        List<String> externalIds = shellService.findExternalShellIdsByIdentifiersByAnyMatch(shellMapper.fromApiDto(assetIds));
+        return new ResponseEntity<>(externalIds, HttpStatus.OK);
+    }
 
 
 }

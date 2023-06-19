@@ -56,7 +56,7 @@ public abstract class AbstractAssetAdministrationShellApi {
     protected static final String SHELL_BASE_PATH = "/api/v3.0/shell-descriptors";
     protected static final String SINGLE_SHELL_BASE_PATH = "/api/v3.0/shell-descriptors/{shellIdentifier}";
     protected static final String LOOKUP_SHELL_BASE_PATH = "/api/v3.0/lookup/shells";
-    protected static final String SINGLE_LOOKUP_SHELL_BASE_PATH = "/api/v3.0/lookup/shells/{shellIdentifier}";
+    protected static final String SINGLE_LOOKUP_SHELL_BASE_PATH = "/api/v3.0/lookup/shells/{aasIdentifier}";
     protected static final String SUB_MODEL_BASE_PATH = "/api/v3.0/shell-descriptors/{shellIdentifier}/submodel-descriptors";
     protected static final String SINGLE_SUB_MODEL_BASE_PATH = "/api/v3.0/shell-descriptors/{shellIdentifier}/submodel-descriptors/{submodelIdentifier}";
 
@@ -185,8 +185,20 @@ public abstract class AbstractAssetAdministrationShellApi {
     }
 
     protected ObjectNode specificAssetId(String key, String value, String tenantId){
+
         ObjectNode specificAssetId = mapper.createObjectNode();
-        specificAssetId.put("key", key);
+        specificAssetId.put("name", key);
+        specificAssetId.put("value", value);
+        if(tenantId != null){
+            specificAssetId.set("externalSubjectId", mapper.createObjectNode()
+                    .set("value", emptyArrayNode().add(tenantId) ));
+        }
+        return specificAssetId;
+    }
+
+    protected ObjectNode tempspecificAssetId(String key, String value, String tenantId){
+        ObjectNode specificAssetId = mapper.createObjectNode();
+        specificAssetId.put("name", key);
         specificAssetId.put("value", value);
         if(tenantId != null){
             specificAssetId.set("externalSubjectId", mapper.createObjectNode()

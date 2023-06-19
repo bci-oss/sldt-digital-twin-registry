@@ -446,29 +446,29 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
     @DisplayName("Lookup Authorization Test")
     class LookupTest {
 
-//        @Test -> lookup
-//        public void testRbacForLookupByAssetIds() throws Exception {
-//            ArrayNode specificAssetIds = emptyArrayNode().add(specificAssetId("abc", "123"));
-//            mvc.perform(
-//                            MockMvcRequestBuilders
-//                                    .get(LOOKUP_SHELL_BASE_PATH)
-//                                    .queryParam("assetIds",  toJson(specificAssetIds))
-//                                    .accept(MediaType.APPLICATION_JSON)
-//                                    .with(jwtTokenFactory.addTwin())
-//                    )
-//                    .andDo(MockMvcResultHandlers.print())
-//                    .andExpect(status().isForbidden());
-//
-//            mvc.perform(
-//                            MockMvcRequestBuilders
-//                                    .get(LOOKUP_SHELL_BASE_PATH)
-//                                    .queryParam("assetIds",  toJson(specificAssetIds))
-//                                    .accept(MediaType.APPLICATION_JSON)
-//                                    .with(jwtTokenFactory.readTwin())
-//                    )
-//                    .andDo(MockMvcResultHandlers.print())
-//                    .andExpect(status().isOk());
-//        }
+        @Test
+        public void testRbacForLookupByAssetIds() throws Exception {
+            ArrayNode specificAssetIds = emptyArrayNode().add(specificAssetId("abc", "123"));
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(LOOKUP_SHELL_BASE_PATH)
+                                    .queryParam("assetIds",  toJson(specificAssetIds))
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.addTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isForbidden());
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(LOOKUP_SHELL_BASE_PATH)
+                                    .queryParam("assetIds",  toJson(specificAssetIds))
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.readTwin())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk());
+        }
 
     }
 
@@ -803,6 +803,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
             submodelDescriptor.setEndpoints(List.of(endpoint));
             aas.setEndpoints(List.of(endpoint));
             aas.setSubmodelDescriptors(List.of(submodelDescriptor));
+
             return aas;
         }
 
@@ -819,43 +820,59 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 //            String tenantThreeAssetIdValue = "tenantThree23408410293o42731";
 //            String withoutTenantAssetIdValue = "withoutTenant23947192jf18";
 //            ArrayNode specificAssetIds = emptyArrayNode()
-//                    .add(specificAssetId("CustomerPartId", tenantTwoAssetIdValue,  jwtTokenFactory.tenantTwo().getTenantId()))
-//                    .add(specificAssetId("CustomerPartId", tenantThreeAssetIdValue, jwtTokenFactory.tenantThree().getTenantId()))
-//                    .add(specificAssetId("MaterialNumber",withoutTenantAssetIdValue));
-//
-//            String shellId = shellPayload.getId();
-//            mvc.perform(
-//                            MockMvcRequestBuilders
-//                                    .post(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
-//                                    .accept(MediaType.APPLICATION_JSON)
-//                                    .contentType(MediaType.APPLICATION_JSON)
-//                                    .content(toJson(specificAssetIds))
-//                                    .with(jwtTokenFactory.allRoles())
-//                    )
-//                    .andDo(MockMvcResultHandlers.print())
-//                    .andExpect(status().isCreated())
-//                    .andExpect(content().json(toJson(specificAssetIds)));
-//
-//            mvc.perform(
-//                            MockMvcRequestBuilders
-//                                    .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
-//                                    .accept(MediaType.APPLICATION_JSON)
-//                                    .with(jwtTokenFactory.allRoles())
-//                    )
-//                    .andDo(MockMvcResultHandlers.print())
-//                    .andExpect(status().isOk())
+//                    .add(tempspecificAssetId("CustomerPartId", tenantTwoAssetIdValue,  jwtTokenFactory.tenantTwo().getTenantId()))
+//                    .add(tempspecificAssetId("CustomerPartId", tenantThreeAssetIdValue, jwtTokenFactory.tenantThree().getTenantId()))
+//                    .add(tempspecificAssetId("MaterialNumber",withoutTenantAssetIdValue,null));
+
+            SpecificAssetId specificAssetId = new SpecificAssetId();
+            Reference externalSubjectId = new Reference();
+            externalSubjectId.setType(ReferenceTypes.EXTERNALREFERENCE);
+            Key key = new Key();
+            key.setType(KeyTypes.SUBMODEL);
+            key.setValue("semanticIdExample");
+            externalSubjectId.setKeys(List.of(key));
+
+            //specificAssetId.setExternalSubjectId(externalSubjectId);
+            specificAssetId.setName("assetName");
+            specificAssetId.setValue("assetValue");
+
+//            specificAssetId.setSemanticId(externalSubjectId);
+//            specificAssetId.setSupplementalSemanticIds(List.of(externalSubjectId));
+
+
+            String shellId = shellPayload.getId();
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .post(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(mapper.writeValueAsString(List.of(specificAssetId)))
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isCreated())
+                    .andExpect(content().json(mapper.writeValueAsString(List.of(specificAssetId))));
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk());
 //                    .andExpect(jsonPath("$[*].value", containsInAnyOrder(tenantTwoAssetIdValue,
 //                            tenantThreeAssetIdValue,
 //                            withoutTenantAssetIdValue)));
-//
-//            mvc.perform(
-//                            MockMvcRequestBuilders
-//                                    .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
-//                                    .accept(MediaType.APPLICATION_JSON)
-//                                    .with(jwtTokenFactory.tenantTwo().allRoles())
-//                    )
-//                    .andDo(MockMvcResultHandlers.print())
-//                    .andExpect(status().isOk())
+
+            mvc.perform(
+                            MockMvcRequestBuilders
+                                    .get(SINGLE_LOOKUP_SHELL_BASE_PATH, shellId)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .with(jwtTokenFactory.tenantTwo().allRoles())
+                    )
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk());
 //                    .andExpect(jsonPath("$[*].value", hasItems(tenantTwoAssetIdValue, withoutTenantAssetIdValue)))
 //                    .andExpect(jsonPath("$[*].value", not(hasItem(tenantThreeAssetIdValue))));
         }
