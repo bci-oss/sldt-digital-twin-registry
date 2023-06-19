@@ -38,11 +38,12 @@ public interface ShellMapper {
           @Mapping(target = "identifiers", source = "specificAssetIds"),
          @Mapping(target = "descriptions", source = "description"),
           @Mapping(target = "submodels", source = "submodelDescriptors"),
+           //@Mapping(target = "submodels.descriptions.text", source = "description.text"),
           @Mapping(target = "id", ignore = true)
     })
     Shell fromApiDto(AssetAdministrationShellDescriptor apiDto);
 
-   @Mapping(target = "text", ignore = true)
+   //@Mapping(target = "text", ignore = true)
     ShellDescription mapShellDescription (LangStringTextType description);
 
    @Mappings({
@@ -69,10 +70,17 @@ public interface ShellMapper {
 
     List<BatchResult> toListApiDto(List<BatchResultDto> batchResults);
 */
+
+    @Mappings({
+            @Mapping(source = "idExternal", target = "id"),
+            @Mapping(source = "identifiers", target = "specificAssetIds"),
+            @Mapping(source = "descriptions", target = "description"),
+            @Mapping(source = "submodels", target = "submodelDescriptors"),
+    })
     @InheritInverseConfiguration
     AssetAdministrationShellDescriptor toApiDto(Shell shell);
 
-   @Mapping(target = "text", ignore = true)
+  // @Mapping(target = "text", ignore = true)
    LangStringTextType mapAssetDescription (ShellDescription description);
 
 

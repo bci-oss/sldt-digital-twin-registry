@@ -52,7 +52,7 @@ public interface SubmodelMapper {
     })
     Submodel fromApiDto(SubmodelDescriptor apiDto);
 
-   @Mapping(target = "text", ignore = true)
+   //@Mapping(target = "text", ignore = true)
    SubmodelDescription mapShellDescription (LangStringTextType description);
 
     @Mappings({
@@ -86,13 +86,13 @@ public interface SubmodelMapper {
     @InheritInverseConfiguration
     SubmodelDescriptor toApiDto(Submodel shell);
 
-   @Mapping(target = "text", ignore = true)
+  // @Mapping(target = "text", ignore = true)
    LangStringTextType mapSubModelDescription (SubmodelDescription description);
 
     @InheritInverseConfiguration
     Endpoint toApiDto(SubmodelEndpoint apiDto);
 
-   @Mapping(target = "text", ignore = true)
+   //@Mapping(target = "text", ignore = true)
    default List<String>  protocolVersionDescriptor(String version){
       return List.of(version);
    }

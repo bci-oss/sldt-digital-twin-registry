@@ -188,10 +188,10 @@ public class ShellMapperTest {
 
         LangStringTextType description1 = new LangStringTextType();
         description1.setLanguage( "de" );
-        description1.setText( JsonNullable.of( "this is an example description1" ) );
+        description1.setText(  "this is an example description1"  );
         LangStringTextType description2 = new LangStringTextType();
         description2.setLanguage( "en" );
-        description2.setText( JsonNullable.of( "this is an example description2" ) );
+        description2.setText("this is an example description2"  );
         aas.setDescription(List.of(description1, description2));
 
 //        LangString description1 = new LangString();

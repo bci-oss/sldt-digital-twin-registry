@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import jakarta.validation.ValidationException;
 import org.eclipse.tractusx.semantics.aas.registry.model.Message;
 import org.eclipse.tractusx.semantics.aas.registry.model.Result;
 import org.eclipse.tractusx.semantics.registry.model.support.DatabaseExceptionTranslation;
