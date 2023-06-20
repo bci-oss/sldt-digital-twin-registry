@@ -31,6 +31,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +50,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
     class SecurityTests {
         @Test
         public void testWithoutAuthenticationTokenProvidedExpectUnauthorized() throws Exception {
-            mvc.perform(
+                       mvc.perform(
                             MockMvcRequestBuilders
                                     .get(SINGLE_SHELL_BASE_PATH, UUID.randomUUID())
                                     .accept(MediaType.APPLICATION_JSON)
@@ -179,13 +181,16 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
         @Test
         public void testRbacForUpdate() throws Exception {
-            ObjectNode shellPayloadForUpdate = createShell()
-                    .put("identification", shellId);
+
+           AssetAdministrationShellDescriptor testAas = TestUtil.createCompleteAasDescriptor();
+           testAas.setId( shellId );
+
+           String shellPayloadForUpdate = mapper.writeValueAsString(testAas);
             mvc.perform(
                             MockMvcRequestBuilders
                                     .put(SINGLE_SHELL_BASE_PATH, shellId)
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(shellPayloadForUpdate))
+                                    .content(shellPayloadForUpdate)
                                     // test with wrong role
                                     .with(jwtTokenFactory.readTwin())
                     )
@@ -197,7 +202,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                             MockMvcRequestBuilders
                                     .put(SINGLE_SHELL_BASE_PATH, shellId )
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(shellPayloadForUpdate))
+                                    .content(shellPayloadForUpdate)
                                     .with(jwtTokenFactory.updateTwin())
                     )
                     .andDo(MockMvcResultHandlers.print())
@@ -233,17 +238,19 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
     class SubmodelDescriptorCrudTests {
        private String shellId;
        private String submodelId;
+       private String submodelIdAas;
 
        @BeforeEach
        public void before() throws Exception{
-           ObjectNode shell = createShell();
-           performShellCreateRequest(toJson(shell));
 
-           ObjectNode submodel = createSubmodel("submodelIdPrefix");
-           performSubmodelCreateRequest(toJson(submodel), getId(shell));
+          AssetAdministrationShellDescriptor testAas = TestUtil.createCompleteAasDescriptor();
+          performShellCreateRequest(mapper.writeValueAsString(testAas));
+          shellId = testAas.getId();
+          submodelIdAas = testAas.getSubmodelDescriptors().get( 0 ).getId();
 
-           shellId = getId(shell);
-           submodelId = getId(submodel);
+          SubmodelDescriptor testSubmodelDescriptor = TestUtil.createSubmodel();
+          performShellCreateRequest(mapper.writeValueAsString(testSubmodelDescriptor));
+          submodelId = testSubmodelDescriptor.getId();
        }
 
 
@@ -273,7 +280,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
         public void testRbacForGetById() throws Exception {
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .get(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                                    .get(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelIdAas )
                                     .accept(MediaType.APPLICATION_JSON)
                                     // test with wrong role
                                     .with(jwtTokenFactory.deleteTwin())
@@ -283,7 +290,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .get(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
+                                    .get(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelIdAas )
                                     .accept(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.readTwin())
                     )
@@ -293,11 +300,17 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
         @Test
         public void testRbacForCreate() throws Exception {
+
+           SubmodelDescriptor testSubmodelDescriptor = TestUtil.createSubmodel();
+           testSubmodelDescriptor.setId( UUID.randomUUID().toString() );
+           String submodelPayloadForCreate = mapper.writeValueAsString(testSubmodelDescriptor);
+
             mvc.perform(
                             MockMvcRequestBuilders
                                     .post(SUB_MODEL_BASE_PATH, shellId )
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(createSubmodel("exampleSubmodel")))
+                                   // .content(toJson(createSubmodel("exampleSubmodel")))
+                                    .content( submodelPayloadForCreate )
                                     // test with wrong role
                                     .with(jwtTokenFactory.readTwin())
                     )
@@ -308,7 +321,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
                             MockMvcRequestBuilders
                                     .post(SUB_MODEL_BASE_PATH, shellId)
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(createSubmodel("exampleSubmodel")))
+                                    .content( submodelPayloadForCreate )
                                     .with(jwtTokenFactory.addTwin())
                     )
                     .andDo(MockMvcResultHandlers.print())
@@ -319,12 +332,20 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
         @Test
         public void testRbacForUpdate() throws Exception {
             ObjectNode submodelToUpdate = createSubmodel("1231")
-                    .put("identification", submodelId);
+                    .put("id", submodelId);
+
+           SubmodelDescriptor testSubmodelDescriptor = TestUtil.createSubmodel();
+           //testSubmodelDescriptor.setId(   UUID.randomUUID().toString() );
+         //  testSubmodelDescriptor.setId(   submodelId );
+           testSubmodelDescriptor.setId(   submodelIdAas );
+
+           String submodelPayloadForCreate = mapper.writeValueAsString(testSubmodelDescriptor);
+
             mvc.perform(
                             MockMvcRequestBuilders
                                     .put(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId )
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(submodelToUpdate))
+                                    .content(submodelPayloadForCreate)
                                     // test with wrong role
                                     .with(jwtTokenFactory.readTwin())
                     )
@@ -333,9 +354,10 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .put(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId)
+                                    .put(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelIdAas)
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(submodelToUpdate))
+                                    //.content(toJson(submodelToUpdate))
+                                    .content(submodelPayloadForCreate)
                                     .with(jwtTokenFactory.updateTwin())
                     )
                     .andDo(MockMvcResultHandlers.print())
@@ -346,7 +368,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
         public void testRbacForDelete() throws Exception {
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .delete(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId)
+                                    .delete(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelIdAas)
                                     .contentType(MediaType.APPLICATION_JSON)
                                     // test with wrong role
                                     .with(jwtTokenFactory.readTwin())
@@ -356,7 +378,7 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .delete(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelId)
+                                    .delete(SINGLE_SUB_MODEL_BASE_PATH, shellId, submodelIdAas)
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .with(jwtTokenFactory.deleteTwin())
                     )
