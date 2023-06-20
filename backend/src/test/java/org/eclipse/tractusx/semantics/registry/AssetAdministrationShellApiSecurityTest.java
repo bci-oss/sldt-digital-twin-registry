@@ -98,9 +98,11 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
         @BeforeEach
         public void before() throws Exception{
-            ObjectNode shell = createShell();
-            performShellCreateRequest(toJson(shell));
-            shellId = getId(shell);
+            AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
+            shellPayload1.setId(UUID.randomUUID().toString());
+            performShellCreateRequest(mapper.writeValueAsString(shellPayload1));
+            shellId = shellPayload1.getId();
+
         }
 
         @Test
@@ -150,23 +152,25 @@ public class AssetAdministrationShellApiSecurityTest extends AbstractAssetAdmini
 
         @Test
         public void testRbacForCreate() throws Exception {
-            ObjectNode shellPayloadForPost = createShell();
+            AssetAdministrationShellDescriptor shellPayload1 = TestUtil.createCompleteAasDescriptor();
+            shellPayload1.setId(UUID.randomUUID().toString());
             mvc.perform(
                             MockMvcRequestBuilders
                                     .post(SHELL_BASE_PATH)
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(shellPayloadForPost))
+                                    .content(mapper.writeValueAsString(shellPayload1))
                                     // test with wrong role
                                     .with(jwtTokenFactory.readTwin())
                     )
                     .andDo(MockMvcResultHandlers.print())
                     .andExpect(status().isForbidden());
 
+            shellPayload1.setId(UUID.randomUUID().toString());
             mvc.perform(
                             MockMvcRequestBuilders
-                                    .post(SHELL_BASE_PATH, toJson(shellPayloadForPost) )
+                                    .post(SHELL_BASE_PATH, mapper.writeValueAsString(shellPayload1) )
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(toJson(shellPayloadForPost))
+                                    .content(mapper.writeValueAsString(shellPayload1))
                                     .with(jwtTokenFactory.addTwin())
                     )
                     .andDo(MockMvcResultHandlers.print())
