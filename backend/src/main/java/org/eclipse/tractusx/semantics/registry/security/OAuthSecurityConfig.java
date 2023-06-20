@@ -59,7 +59,7 @@ public class OAuthSecurityConfig {
              // fetch endpoint is allowed for reader
             .requestMatchers(HttpMethod.POST,"/**/registry/**/fetch").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
              // others are HTTP method based
-            .requestMatchers(HttpMethod.GET,"/**/registry/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
+            .requestMatchers(HttpMethod.GET,"/**/shell-descriptors/**").access("@authorizationEvaluator.hasRoleViewDigitalTwin()")
             .requestMatchers(HttpMethod.POST,"/**/registry/**").access("@authorizationEvaluator.hasRoleAddDigitalTwin()")
             .requestMatchers(HttpMethod.PUT,"/**/registry/**").access("@authorizationEvaluator.hasRoleUpdateDigitalTwin()")
             .requestMatchers(HttpMethod.DELETE,"/**/registry/**").access("@authorizationEvaluator.hasRoleDeleteDigitalTwin()")

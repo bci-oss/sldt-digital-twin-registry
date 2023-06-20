@@ -157,8 +157,8 @@ public class AssetAdministrationShellApiDelegateNEW implements DescriptionApiDel
     }
 
     @Override
-    public ResponseEntity<List<String>> getAllAssetAdministrationShellIdsByAssetLink(List<SpecificAssetId> assetIds
-    ) {
+    public ResponseEntity<List<String>> getAllAssetAdministrationShellIdsByAssetLink(List<SpecificAssetId> assetIds,
+    Integer limit, String cursor) {
         if (assetIds == null || assetIds.isEmpty()) {
             return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
         }

@@ -55,7 +55,8 @@ public interface SubmodelMapper {
     @Mappings({
             @Mapping(target="idExternal", source="id"), // id == identification
           @Mapping(target = "descriptions", source = "description"),
-            @Mapping(target="semanticId", source = "semanticId")
+            @Mapping(target="semanticId", source = "semanticId"),
+            @Mapping(target = "id", ignore = true)
     })
     Submodel fromApiDto(SubmodelDescriptor apiDto);
 

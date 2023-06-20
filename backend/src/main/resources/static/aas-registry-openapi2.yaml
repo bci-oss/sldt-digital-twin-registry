@@ -697,6 +697,19 @@ paths:
               examples:
                 complete:
                   $ref: '#/components/examples/lookup-shells-by-aas-identifier-query'
+        - name: limit
+          in: query
+          description: The maximum number of elements in the response array
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: cursor
+          in: query
+          description: A server-generated identifier retrieved from pagingMetadata that specifies from which position the result listing should continue
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: Requested Asset Administration Shell ids

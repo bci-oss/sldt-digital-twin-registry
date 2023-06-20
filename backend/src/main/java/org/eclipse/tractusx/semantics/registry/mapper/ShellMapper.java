@@ -101,6 +101,9 @@ public interface ShellMapper {
    LangStringTextType mapAssetDescription (ShellDescription description);
 
 
+    @Mappings({
+            @Mapping(source = "items", target = "result"),
+    })
    GetAssetAdministrationShellDescriptorsResult toApiDto( ShellCollectionDto shell);
 
 
