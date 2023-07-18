@@ -213,21 +213,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: FK_SHELL_EXT_SEMANTIC_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: true
-              - column:
-                  name: FK_SHELL_EXT_SUPPLEMENTAL_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: true
-              - column:
-                  name: FK_SHELL_EXT_REFERS_ID
-                  type: ${uuid_type}
-                  constraints:
-                    nullable: true
-              - column:
                   name: FK_SUBMOD_EXT_SEMANTIC_ID
                   type: ${uuid_type}
                   constraints:
@@ -242,33 +227,6 @@ databaseChangeLog:
                   type: ${uuid_type}
                   constraints:
                     nullable: true
-        - addForeignKeyConstraint:
-            baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_EXT_SEMANTIC_ID
-            constraintName: REF_FK_SHELL_EXT_SEMANTIC
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL_EXTENSION
-            validate: true
-        - addForeignKeyConstraint:
-            baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_EXT_SUPPLEMENTAL_ID
-            constraintName: REF_FK_SHELL_EXT_SUPPLEMENTAL
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL_EXTENSION
-            validate: true
-        - addForeignKeyConstraint:
-            baseTableName: REFERENCE
-            baseColumnNames: FK_SHELL_EXT_REFERS_ID
-            constraintName: REF_FK_SHELL_EXT_REFERS
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            referencedColumnNames: ID
-            referencedTableName: SHELL_EXTENSION
-            validate: true
         - addForeignKeyConstraint:
             baseTableName: REFERENCE
             baseColumnNames: FK_SUBMOD_EXT_SEMANTIC_ID

@@ -30,33 +30,21 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.With;
 
-
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@With
-public class ShellExtension {
-
+public class ShellExtensionSupplemSemanticIdReference {
    @Id
    UUID id;
 
-   @Column("fk_shell_ext_semantic_id")
-   ShellExtensionSemanticIdReference semanticId;
+   ReferenceType type;
 
-   @MappedCollection(idColumn = "fk_shell_ext_supplemental_id")
-   Set<ShellExtensionSupplemSemanticIdReference> supplementalSemanticIds;
+   @MappedCollection(idColumn = "fk_shell_extension_supplem_semantic_reference_id")
+   Set<ShellExtensionSupplemSemanticIdReferenceKey> keys;
 
-   String name;
-
-   DataTypeXsd valueType;
-
-   @Column("shell_ext_value")
-   String value;
-
-   @MappedCollection(idColumn = "fk_shell_ext_refers_id")
-   Set<ShellExtensionRefersToReference> refersTo;
+   @Column("fk_shell_extension_supplem_semantic_referred_id" )
+   ShellExtensionSupplemSemanticIdReferenceParent referredSemanticId;
 
 }

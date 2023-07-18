@@ -52,6 +52,15 @@ import org.eclipse.tractusx.semantics.registry.model.Shell;
 import org.eclipse.tractusx.semantics.registry.model.ShellDescription;
 import org.eclipse.tractusx.semantics.registry.model.ShellDisplayName;
 import org.eclipse.tractusx.semantics.registry.model.ShellExtension;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionRefersToReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionRefersToReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionRefersToReferenceParent;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSemanticIdReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSemanticIdReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSemanticIdReferenceParent;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSupplemSemanticIdReference;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSupplemSemanticIdReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.ShellExtensionSupplemSemanticIdReferenceParent;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifier;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReference;
 import org.eclipse.tractusx.semantics.registry.model.ShellIdentifierExternalSubjectReferenceKey;
@@ -239,7 +248,7 @@ public class ShellMapperTest {
         assertThat( aasExtension.getName() ).isEqualTo( shell.getShellExtensions().stream().findFirst().get().getName() );
         assertThat( aasExtension.getRefersTo() ).hasSize( 1 );
         assertThat( aasExtension.getSupplementalSemanticIds() ).hasSize( 1 );
-        assertThat( aasExtension.getSupplementalSemanticIds().get( 0 ).getType() ).isEqualTo( ReferenceTypes.MODELREFERENCE );
+        assertThat( aasExtension.getSupplementalSemanticIds().get( 0 ).getType() ).isEqualTo( ReferenceTypes.EXTERNALREFERENCE );
     }
 
     private Shell createCompleteShell() {
@@ -379,21 +388,47 @@ public class ShellMapperTest {
         org.eclipse.tractusx.semantics.registry.model.Reference shellReference2 =
               new org.eclipse.tractusx.semantics.registry.model.Reference( UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(shellKey), shellParent);
 
+        //ShellExtensionRefersToReference
+        ShellExtensionRefersToReferenceKey refersToReferenceKey =
+              new ShellExtensionRefersToReferenceKey(UUID.randomUUID(), ReferenceKeyType.BLOB, "refersToReferenceKey value");
+        ShellExtensionRefersToReferenceParent refersToReferenceParent =
+              new ShellExtensionRefersToReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(refersToReferenceKey));
+        ShellExtensionRefersToReference refersToReference =
+              new ShellExtensionRefersToReference(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(refersToReferenceKey), refersToReferenceParent);
+
+
+        //ShellExtensionSupplemSemanticIdReference
+        ShellExtensionSupplemSemanticIdReferenceKey supplemSemanticIdReferenceKey =
+              new ShellExtensionSupplemSemanticIdReferenceKey(UUID.randomUUID(), ReferenceKeyType.BLOB, "supplem SemanticIdReferenceKey value");
+        ShellExtensionSupplemSemanticIdReferenceParent supplemSemanticIdReferenceParent =
+              new ShellExtensionSupplemSemanticIdReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(supplemSemanticIdReferenceKey));
+        ShellExtensionSupplemSemanticIdReference supplemSemanticIdReference =
+              new ShellExtensionSupplemSemanticIdReference(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(supplemSemanticIdReferenceKey), supplemSemanticIdReferenceParent);
+
+        //ShellExtensionSemanticIdReference
+        ShellExtensionSemanticIdReferenceKey semanticIdReferenceKey =
+              new ShellExtensionSemanticIdReferenceKey(UUID.randomUUID(), ReferenceKeyType.BLOB, "SemanticIdReferenceKey value");
+        ShellExtensionSemanticIdReferenceParent semanticIdReferenceParent =
+              new ShellExtensionSemanticIdReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(semanticIdReferenceKey));
+        ShellExtensionSemanticIdReference semanticIdReference =
+              new ShellExtensionSemanticIdReference(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(semanticIdReferenceKey), semanticIdReferenceParent);
+
         ShellExtension shellExtension = new ShellExtension(
               UUID.randomUUID(),
-              shellReference1,
-              Set.of(shellReference1),
+              semanticIdReference,
+              Set.of(supplemSemanticIdReference),
               "shell extension",
               DataTypeXsd.BOOLEAN,
               "shell extension value",
-              Set.of(shellReference2)
+              Set.of(refersToReference)
         );
+
 
         return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
               shellIdentifiers, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName), Set.of(shellExtension));
 
 //        return new Shell(UUID.randomUUID(), "idExternalExample", "idShortExample",
-//              null, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName), Set.of(shellExtension));
+//              shellIdentifiers, shellDescriptions, Set.of(submodel), null,null, ShellKind.INSTANCE, "shellType", Set.of(shellDisplayName), null);
 
 
     }
