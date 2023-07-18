@@ -40,6 +40,7 @@ import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
 import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformation;
 import org.eclipse.tractusx.semantics.aas.registry.model.ProtocolInformationSecurityAttributes;
 import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
+import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceParent;
 import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
@@ -86,6 +87,9 @@ import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionSupplemSem
 import org.eclipse.tractusx.semantics.registry.model.SubmodelExtensionSupplemSemanticIdReferenceParent;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelSecurityAttribute;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelSecurityType;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSemanticIdReference;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSemanticIdReferenceKey;
+import org.eclipse.tractusx.semantics.registry.model.SubmodelSemanticIdReferenceParent;
 import org.junit.jupiter.api.Test;
 
 public class ShellMapperTest {
@@ -151,9 +155,9 @@ public class ShellMapperTest {
               .isEqualTo( submodelDescriptor.getExtensions().get( 0 ).getSemanticId().getType().toString() );
         assertThat( submodelExtension.getRefersTo() ).hasSize( 1 );
         assertThat( submodelExtension.getSubmodSupplementalIds() ).hasSize( 1 );
-
-
-
+        assertThat( submodel.getSemanticId().getReferredSemanticId().getType().toString()).isEqualTo( "ModelReference" );
+        assertThat( submodel.getSemanticId().getKeys() ).hasSize( 1 );
+        assertThat(submodel.getSemanticId().getType().toString()).isEqualTo( "ExternalReference" );
 
         // new Fields AAS / Shell
         assertThat( shell.getShellKind().getValue() ).isEqualTo( aas.getAssetKind().getValue() );
@@ -226,6 +230,11 @@ public class ShellMapperTest {
               .isEqualTo( apiSubmodelDescriptor.getDisplayName().stream().findFirst().get().getLanguage() );
         assertThat( submodel.getDisplayNames().stream().findFirst().get().getText() )
               .isEqualTo( apiSubmodelDescriptor.getDisplayName().stream().findFirst().get().getText() );
+
+        assertThat( apiSubmodelDescriptor.getSemanticId().getReferredSemanticId().getKeys() ).hasSize( 1 );
+        assertThat(apiSubmodelDescriptor.getSemanticId().getKeys().get( 0 ).getValue()).isEqualTo( "submodelSemanticIdReferenceKey value" );
+        assertThat(apiSubmodelDescriptor.getSemanticId().getType().toString()).isEqualTo( submodel.getSemanticId().getType().toString() );
+
         // submodelDescriptorsExtensions
         Extension submodelDescriptorExtension = apiSubmodelDescriptor.getExtensions().get( 0 );
         SubmodelExtension submodelExtension = submodel.getSubmodelExtensions().stream().findFirst().get();
@@ -410,9 +419,24 @@ public class ShellMapperTest {
               "submodel security attribute key",
               "submodel security attribute value" );
 
+
+        // Submodel SemanticID Reference
+        SubmodelSemanticIdReferenceKey submodelSemanticIdReferenceKey =
+              new SubmodelSemanticIdReferenceKey(UUID.randomUUID(),ReferenceKeyType.SUBMODEL,"submodelSemanticIdReferenceKey value" );
+
+        SubmodelSemanticIdReferenceParent submodelSemanticIdReferenceParent =
+              new SubmodelSemanticIdReferenceParent(UUID.randomUUID(), ReferenceType.EXTERNALREFERENCE, Set.of(submodelSemanticIdReferenceKey));
+
+        SubmodelSemanticIdReference submodelSemanticIdReference = new SubmodelSemanticIdReference(
+              UUID.randomUUID(),
+              ReferenceType.EXTERNALREFERENCE,
+              Set.of(submodelSemanticIdReferenceKey),
+              submodelSemanticIdReferenceParent);
+
+
         Submodel submodel = new Submodel(UUID.randomUUID(),
                 "submodelIdExternal",
-                "submodelIdShort", "submodelSemanticId",
+                "submodelIdShort", submodelSemanticIdReference,
                 Set.of(new SubmodelDescription(UUID.randomUUID(), "en", "example submodel description")),
                 Set.of(new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
                         "endpointAddressExample", "endpointProtocolExample",
@@ -424,6 +448,22 @@ public class ShellMapperTest {
               Set.of(submodelDisplayName),
               Set.of(submodelExtension)
         );
+
+//        Submodel submodel = new Submodel(UUID.randomUUID(),
+//              "submodelIdExternal",
+//              "submodelIdShort", null,
+//              Set.of(new SubmodelDescription(UUID.randomUUID(), "en", "example submodel description")),
+//              Set.of(new SubmodelEndpoint(UUID.randomUUID(), "interfaceExample",
+//                    "endpointAddressExample", "endpointProtocolExample",
+//                    "endpointProtocolVersionExample", "subProtocolExample"
+//                    , "subProtocolBodyExample", "subProtocolEncodingExample",
+//                    Set.of(submodelSecurityAttribute)
+//              )),
+//              null,
+//              Set.of(submodelDisplayName),
+//              Set.of(submodelExtension)
+//        );
+
 
         ShellDisplayName shellDisplayName = new ShellDisplayName( UUID.randomUUID(), "de", "Display name" );
 
@@ -591,7 +631,13 @@ public class ShellMapperTest {
         Key key = new Key();
         key.setType( KeyTypes.SUBMODEL );
         key.setValue( "semanticIdExample" );
+
+        ReferenceParent semanticReferenceParent = new ReferenceParent();
+        semanticReferenceParent.setKeys( List.of(key) );
+        semanticReferenceParent.setType( ReferenceTypes.MODELREFERENCE );
+
         submodelSemanticReference.setKeys( List.of(key) );
+        submodelSemanticReference.setReferredSemanticId( semanticReferenceParent );
 
 
         //SubmodelDescriptor Extension:

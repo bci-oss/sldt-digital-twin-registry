@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,40 +19,28 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import lombok.Value;
-import lombok.With;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Value
-@With
-public class Submodel {
-    @Id
-    UUID id;
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class SubmodelSemanticIdReferenceKey {
 
-    String idExternal;
-    String idShort;
-    @Column("fk_submodel_id")
-    SubmodelSemanticIdReference semanticId;
+   @Id
+   UUID id;
+   ReferenceKeyType type;
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelDescription> descriptions;
-
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelEndpoint> endpoints;
-
-    @Column( "fk_shell_id")
-    UUID shellId;
-
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelDisplayName> displayNames;
-
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelExtension> submodelExtensions;
-
+   @Column("ref_key_value")
+   String value;
 }
+
+

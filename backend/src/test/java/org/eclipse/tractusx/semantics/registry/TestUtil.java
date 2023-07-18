@@ -180,12 +180,21 @@ public class TestUtil {
         endpoint.setInterface("interfaceNameExample");
         endpoint.setProtocolInformation(protocolInformation);
 
-        Reference semanticIDReference = new Reference();
-       semanticIDReference.setType(ReferenceTypes.EXTERNALREFERENCE);
+        Reference submodelSemanticReference = new Reference();
+       submodelSemanticReference.setType(ReferenceTypes.EXTERNALREFERENCE);
         Key key = new Key();
         key.setType(KeyTypes.SUBMODEL);
         key.setValue("semanticIdExample");
-       semanticIDReference.setKeys(List.of(key));
+       submodelSemanticReference.setKeys(List.of(key));
+
+       ReferenceParent semanticReferenceParent = new ReferenceParent();
+       semanticReferenceParent.setKeys( List.of(key) );
+       semanticReferenceParent.setType( ReferenceTypes.MODELREFERENCE );
+
+       submodelSemanticReference.setKeys( List.of(key) );
+       submodelSemanticReference.setReferredSemanticId( semanticReferenceParent );
+
+
 
        //SubmodelDescriptor Extension:
        Key submodelExtensionKey = new Key();
@@ -214,7 +223,7 @@ public class TestUtil {
         submodelDescriptor.setId(UUID.randomUUID().toString());
 
         submodelDescriptor.setIdShort("idShortExample");
-        submodelDescriptor.setSemanticId(semanticIDReference);
+        submodelDescriptor.setSemanticId(submodelSemanticReference);
 
         submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
@@ -228,14 +237,25 @@ public class TestUtil {
     public static SubmodelDescriptor createSubmodel(){
         SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
         submodelDescriptor.setId(UUID.randomUUID().toString());
-        Reference reference = new Reference();
-        reference.setType(ReferenceTypes.EXTERNALREFERENCE);
-        Key key = new Key();
-        key.setType(KeyTypes.SUBMODEL);
-        key.setValue("semanticIdExample");
-        reference.setKeys(List.of(key));
-        submodelDescriptor.setIdShort("idShortExample");
-        submodelDescriptor.setSemanticId(reference);
+       submodelDescriptor.setIdShort("idShortExample");
+
+       Reference submodelSemanticReference = new Reference();
+       submodelSemanticReference.setType(ReferenceTypes.EXTERNALREFERENCE);
+       Key key = new Key();
+       key.setType(KeyTypes.SUBMODEL);
+       key.setValue("semanticIdExample");
+       submodelSemanticReference.setKeys(List.of(key));
+
+       ReferenceParent semanticReferenceParent = new ReferenceParent();
+       semanticReferenceParent.setKeys( List.of(key) );
+       semanticReferenceParent.setType( ReferenceTypes.MODELREFERENCE );
+
+       submodelSemanticReference.setKeys( List.of(key) );
+       submodelSemanticReference.setReferredSemanticId( semanticReferenceParent );
+       submodelDescriptor.setSemanticId(submodelSemanticReference);
+
+
+
         LangStringTextType description1 = new LangStringTextType();
         description1.setLanguage("de");
         description1.setText("hello text");
