@@ -19,42 +19,28 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.model;
 
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.With;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@With
-public class SubmodelExtension {
+public class SubmodelExtensionSemanticIdReferenceKey {
+
    @Id
    UUID id;
+   ReferenceKeyType type;
 
-   @Column("fk_submod_ext_semantic_id")
-   SubmodelExtensionSemanticIdReference submodSemanticId;
-
-   @MappedCollection(idColumn="fk_submod_ext_supplemental_id")
-   Set<SubmodelExtensionSupplemSemanticIdReference> submodSupplementalIds;
-
-   String name;
-
-   DataTypeXsd valueType;
-
-   @Column("submod_ext_value")
+   @Column("ref_key_value")
    String value;
-
-   @MappedCollection(idColumn = "fk_submod_ext_refers_id" )
-   Set<SubmodelExtensionRefersToReference> refersTo;
-
 }
+
+

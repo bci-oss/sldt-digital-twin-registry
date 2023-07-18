@@ -23,38 +23,24 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.With;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@With
-public class SubmodelExtension {
+public class SubmodelExtensionRefersToReferenceParent {
+
    @Id
    UUID id;
 
-   @Column("fk_submod_ext_semantic_id")
-   SubmodelExtensionSemanticIdReference submodSemanticId;
+   ReferenceType type;
 
-   @MappedCollection(idColumn="fk_submod_ext_supplemental_id")
-   Set<SubmodelExtensionSupplemSemanticIdReference> submodSupplementalIds;
-
-   String name;
-
-   DataTypeXsd valueType;
-
-   @Column("submod_ext_value")
-   String value;
-
-   @MappedCollection(idColumn = "fk_submod_ext_refers_id" )
-   Set<SubmodelExtensionRefersToReference> refersTo;
-
+   @MappedCollection(idColumn = "fk_reference_parent_id")
+   Set<SubmodelExtensionRefersToReferenceKey> keys;
 }

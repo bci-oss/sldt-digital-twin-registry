@@ -30,31 +30,20 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.With;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@With
-public class SubmodelExtension {
+public class SubmodelExtensionRefersToReference {
    @Id
    UUID id;
 
-   @Column("fk_submod_ext_semantic_id")
-   SubmodelExtensionSemanticIdReference submodSemanticId;
+   ReferenceType type;
 
-   @MappedCollection(idColumn="fk_submod_ext_supplemental_id")
-   Set<SubmodelExtensionSupplemSemanticIdReference> submodSupplementalIds;
+   @MappedCollection(idColumn = "fk_submodel_extension_refers_reference_id")
+   Set<SubmodelExtensionRefersToReferenceKey> keys;
 
-   String name;
-
-   DataTypeXsd valueType;
-
-   @Column("submod_ext_value")
-   String value;
-
-   @MappedCollection(idColumn = "fk_submod_ext_refers_id" )
-   Set<SubmodelExtensionRefersToReference> refersTo;
-
+   @Column("fk_submodel_extension_refers_referred_id" )
+   SubmodelExtensionRefersToReferenceParent referredSemanticId;
 }
