@@ -1,6 +1,6 @@
 /********************************************************************************
- * Copyright (c) 2021-2022 Robert Bosch Manufacturing Solutions GmbH
- * Copyright (c) 2021-2022 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Robert Bosch Manufacturing Solutions GmbH
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -26,36 +26,24 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 
-import lombok.Value;
-import lombok.With;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Value
-@With
-public class Submodel {
-    @Id
-    UUID id;
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class SubmodelSupplemSemanticIdReference {
+   @Id
+   UUID id;
 
-    String idExternal;
-    String idShort;
-    @Column("fk_submodel_id")
-    SubmodelSemanticIdReference semanticId;
+   ReferenceType type;
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelDescription> descriptions;
+   @MappedCollection(idColumn = "fk_submodel_supplem_semantic_id_reference_id")
+   Set<SubmodelSupplemSemanticIdReferenceKey> keys;
 
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelEndpoint> endpoints;
-
-    @Column( "fk_shell_id")
-    UUID shellId;
-
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelDisplayName> displayNames;
-
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelExtension> submodelExtensions;
-
-    @MappedCollection(idColumn = "fk_submodel_id")
-    Set<SubmodelSupplemSemanticIdReference> submodelSupplemSemanticIds;
-
+   @Column("fk_submodel_supplem_semantic_id_referred_id" )
+   SubmodelSupplemSemanticIdReferenceParent referredSemanticId;
 }

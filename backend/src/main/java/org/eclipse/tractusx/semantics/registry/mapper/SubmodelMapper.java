@@ -19,9 +19,7 @@
  ********************************************************************************/
 package org.eclipse.tractusx.semantics.registry.mapper;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,10 +27,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.tractusx.semantics.aas.registry.model.Endpoint;
 import org.eclipse.tractusx.semantics.aas.registry.model.Extension;
-import org.eclipse.tractusx.semantics.aas.registry.model.Key;
 import org.eclipse.tractusx.semantics.aas.registry.model.LangStringTextType;
-import org.eclipse.tractusx.semantics.aas.registry.model.Reference;
-import org.eclipse.tractusx.semantics.aas.registry.model.ReferenceTypes;
 import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
 import org.eclipse.tractusx.semantics.registry.model.Submodel;
 import org.eclipse.tractusx.semantics.registry.model.SubmodelDescription;
@@ -54,7 +49,8 @@ public interface SubmodelMapper {
             @Mapping(target="semanticId", source = "semanticId"),
             @Mapping(target = "id", ignore = true),
             @Mapping(target = "displayNames", source = "displayName"),
-          @Mapping(target = "submodelExtensions", source = "extensions")
+          @Mapping(target = "submodelExtensions", source = "extensions"),
+          @Mapping(target = "submodelSupplemSemanticIds", source = "supplementalSemanticId")
     })
     Submodel fromApiDto(SubmodelDescriptor apiDto);
 
@@ -124,29 +120,5 @@ public interface SubmodelMapper {
          @Mapping(source="refersTo", target = "refersTo")
    })
    Extension mapExtension (SubmodelExtension submodelExtension);
-
-
-   default String map(Reference reference) {
-      return Optional.ofNullable(reference).map(Reference::getKeys)
-            .map( Collection::stream)
-            .orElseGet( Stream::empty)
-            .map(Key::getValue)
-            .filter( Objects::nonNull)
-            .findFirst()
-            .orElse(null);
-   }
-
-   // todo: implement types
-    default Reference map(String semanticId){
-        if(semanticId == null ||  semanticId.isBlank()) {
-            return null;
-        }
-        Reference reference = new Reference();
-        reference.setType( ReferenceTypes.EXTERNALREFERENCE );
-        Key key = new Key();
-        key.setValue( semanticId );
-        return reference;
-    }
-
 
 }

@@ -101,14 +101,14 @@ public class TestUtil {
         specificAssetId1.setValue("identifier1ValueExample");
         specificAssetId1.setSemanticId( specificAssetIdReference );
         specificAssetId1.setSupplementalSemanticIds( List.of(assetIdReference) );
-       // specificAssetId1.setExternalSubjectId(externalSubjectIdReference  );
+        specificAssetId1.setExternalSubjectId(externalSubjectIdReference  );
 
        SpecificAssetId specificAssetId2 = new SpecificAssetId();
        specificAssetId2.setName("identifier2KeyExample");
        specificAssetId2.setValue("identifier2ValueExample");
        specificAssetId2.setSemanticId( specificAssetIdReference );
        specificAssetId2.setSupplementalSemanticIds( List.of(assetIdReference) );
-      // specificAssetId2.setExternalSubjectId( externalSubjectIdReference );
+       specificAssetId2.setExternalSubjectId( externalSubjectIdReference );
 
 
        aas.setSpecificAssetIds(List.of(specificAssetId1, specificAssetId2));
@@ -180,6 +180,7 @@ public class TestUtil {
         endpoint.setInterface("interfaceNameExample");
         endpoint.setProtocolInformation(protocolInformation);
 
+        //semanticID
         Reference submodelSemanticReference = new Reference();
        submodelSemanticReference.setType(ReferenceTypes.EXTERNALREFERENCE);
         Key key = new Key();
@@ -194,7 +195,19 @@ public class TestUtil {
        submodelSemanticReference.setKeys( List.of(key) );
        submodelSemanticReference.setReferredSemanticId( semanticReferenceParent );
 
+       //supplemental semanticID
+       Reference submodelSupplemSemanticIdReference = new Reference();
+       submodelSupplemSemanticIdReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+       Key submodelSupplemSemanticIdkey = new Key();
+       submodelSupplemSemanticIdkey.setType( KeyTypes.SUBMODEL );
+       submodelSupplemSemanticIdkey.setValue( "supplementalsemanticIdExample value" );
 
+       ReferenceParent submodelSupplemSemanticIdReferenceParent = new ReferenceParent();
+       submodelSupplemSemanticIdReferenceParent.setKeys( List.of(submodelSupplemSemanticIdkey) );
+       submodelSupplemSemanticIdReferenceParent.setType( ReferenceTypes.MODELREFERENCE );
+
+       submodelSupplemSemanticIdReference.setKeys( List.of(submodelSupplemSemanticIdkey) );
+       submodelSupplemSemanticIdReference.setReferredSemanticId( submodelSupplemSemanticIdReferenceParent );
 
        //SubmodelDescriptor Extension:
        Key submodelExtensionKey = new Key();
@@ -218,12 +231,16 @@ public class TestUtil {
        submodelExtension.setValueType( DataTypeDefXsd.STRING );
        submodelExtension.setSemanticId( submodelExtensionRef );
 
+
+
         SubmodelDescriptor submodelDescriptor = new SubmodelDescriptor();
 
         submodelDescriptor.setId(UUID.randomUUID().toString());
+        submodelDescriptor.setDisplayName( List.of(displayName) );
 
         submodelDescriptor.setIdShort("idShortExample");
         submodelDescriptor.setSemanticId(submodelSemanticReference);
+        submodelDescriptor.setSupplementalSemanticId( List.of(submodelSupplemSemanticIdReference) );
 
         submodelDescriptor.setDescription(List.of(description1, description2));
         submodelDescriptor.setEndpoints(List.of(endpoint));
@@ -263,6 +280,12 @@ public class TestUtil {
         description2.setLanguage("en");
         description2.setText("hello s");
 
+        LangStringNameType displayName = new LangStringNameType();
+        displayName.setLanguage( "en" );
+        displayName.setText( "this is submodel display name" );
+
+
+
         ProtocolInformation protocolInformation = new ProtocolInformation();
         protocolInformation.setEndpointProtocol("endpointProtocolExample");
 
@@ -297,6 +320,18 @@ public class TestUtil {
        submodelExtensionRef.setReferredSemanticId( sumodelExtensionParent );
        submodelExtensionRef.setKeys( List.of(submodelExtensionKey) );
 
+       //supplemental semanticID
+       Reference submodelSupplemSemanticIdReference = new Reference();
+       submodelSupplemSemanticIdReference.setType( ReferenceTypes.EXTERNALREFERENCE );
+       Key submodelSupplemSemanticIdkey = new Key();
+       submodelSupplemSemanticIdkey.setType( KeyTypes.SUBMODEL );
+       submodelSupplemSemanticIdkey.setValue( "supplementalsemanticIdExample value" );
+       ReferenceParent submodelSupplemSemanticIdReferenceParent = new ReferenceParent();
+       submodelSupplemSemanticIdReferenceParent.setKeys( List.of(submodelSupplemSemanticIdkey) );
+       submodelSupplemSemanticIdReferenceParent.setType( ReferenceTypes.MODELREFERENCE );
+       submodelSupplemSemanticIdReference.setKeys( List.of(submodelSupplemSemanticIdkey) );
+       submodelSupplemSemanticIdReference.setReferredSemanticId( submodelSupplemSemanticIdReferenceParent );
+
        Extension submodelExtension = new Extension();
        submodelExtension.setRefersTo( List.of(submodelExtensionRef) );
        submodelExtension.setSupplementalSemanticIds( List.of(submodelExtensionRef) );
@@ -306,7 +341,11 @@ public class TestUtil {
        submodelExtension.setSemanticId( submodelExtensionRef );
        submodelDescriptor.setExtensions( List.of(submodelExtension) );
 
+       submodelDescriptor.setSupplementalSemanticId( List.of(submodelSupplemSemanticIdReference) );
+
        submodelDescriptor.setDescription(List.of(description1, description2));
+       submodelDescriptor.setDisplayName( List.of(displayName) );
+
         submodelDescriptor.setEndpoints(List.of(endpoint));
 
         return submodelDescriptor;
@@ -334,6 +373,7 @@ public class TestUtil {
         reference.setReferredSemanticId( assetIdParent );
 
         specificAssetId1.setSupplementalSemanticIds(List.of(reference));
+       specificAssetId1.setExternalSubjectId(reference  );
 
         return specificAssetId1;
     }
