@@ -20,7 +20,6 @@
 
 package org.eclipse.tractusx.semantics;
 
-import org.eclipse.tractusx.semantics.registry.PostgresTestContainer;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
