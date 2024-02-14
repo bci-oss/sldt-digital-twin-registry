@@ -17,39 +17,26 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  ******************************************************************************/
-package org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy;
+package org.eclipse.tractusx.semantics.accesscontrol.sql.service;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
+import org.springframework.validation.BindingResult;
 
-public enum PolicyOperator {
+import jakarta.validation.Valid;
 
-   EQUALS( "eq", true ),
-   INCLUDES("includes", false );
+public interface AccessControlPersistenceService {
 
-   private final String value;
-   private final boolean singleValued;
+   List<AccessRule> getAllRules();
 
-   PolicyOperator( String value, boolean singleValued ) {
-      this.value = value;
-      this.singleValued = singleValued;
-   }
+   Optional<AccessRule> getRuleById( Long ruleId );
 
-   @JsonCreator
-   public static PolicyOperator forValue( final String value ) {
-      return Arrays.stream( PolicyOperator.values() ).filter( o -> o.getValue().equals( value ) ).findFirst().orElse( null );
-   }
+   AccessRule saveRule( AccessRule rule );
 
-   @JsonValue
-   public String getValue() {
-      return value;
-   }
+   AccessRule updateRule( Long ruleId, AccessRule rule );
 
-   @JsonIgnore
-   public boolean isSingleValued() {
-      return singleValued;
-   }
+   void deleteRule( Long ruleId );
+
 }

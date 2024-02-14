@@ -17,39 +17,25 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  ******************************************************************************/
-package org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy;
+package org.eclipse.tractusx.semantics.accesscontrol.sql.validation;
 
-import java.util.Arrays;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
-public enum PolicyOperator {
+@Retention( RetentionPolicy.RUNTIME )
+@Target( ElementType.TYPE )
+@Constraint( validatedBy = AccessRulePolicyValueValidator.class )
+@Documented
+public @interface ValidAccessRulePolicyValue {
+   String message() default "Invalid rule policy.";
 
-   EQUALS( "eq", true ),
-   INCLUDES("includes", false );
+   Class<?>[] groups() default {};
 
-   private final String value;
-   private final boolean singleValued;
-
-   PolicyOperator( String value, boolean singleValued ) {
-      this.value = value;
-      this.singleValued = singleValued;
-   }
-
-   @JsonCreator
-   public static PolicyOperator forValue( final String value ) {
-      return Arrays.stream( PolicyOperator.values() ).filter( o -> o.getValue().equals( value ) ).findFirst().orElse( null );
-   }
-
-   @JsonValue
-   public String getValue() {
-      return value;
-   }
-
-   @JsonIgnore
-   public boolean isSingleValued() {
-      return singleValued;
-   }
+   Class<? extends Payload>[] payload() default {};
 }

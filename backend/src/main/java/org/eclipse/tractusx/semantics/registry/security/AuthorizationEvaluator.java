@@ -76,6 +76,14 @@ public class AuthorizationEvaluator {
       return containsRole( ROLE_SUBMODEL_ACCESS_CONTROL );
    }
 
+   public boolean hasRoleReadAccessRules() {
+      return containsRole( ROLE_READ_ACCESS_RULES );
+   }
+
+   public boolean hasRoleWriteAccessRules() {
+      return containsRole( ROLE_WRITE_ACCESS_RULES );
+   }
+
    private boolean containsRole( String role ) {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       if ( !(authentication instanceof JwtAuthenticationToken) ) {
@@ -113,6 +121,8 @@ public class AuthorizationEvaluator {
       public static final String ROLE_ADD_DIGITAL_TWIN = "add_digital_twin";
       public static final String ROLE_DELETE_DIGITAL_TWIN = "delete_digital_twin";
       public static final String ROLE_SUBMODEL_ACCESS_CONTROL = "submodel_access_control";
+      public static final String ROLE_READ_ACCESS_RULES = "read_access_rules";
+      public static final String ROLE_WRITE_ACCESS_RULES = "write_access_rules";
    }
 }
 

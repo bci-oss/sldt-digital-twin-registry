@@ -25,24 +25,36 @@ import java.util.stream.Collectors;
 
 import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy.AccessRulePolicyValue;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnCreate;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.validation.OnUpdate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class AccessRulePolicy {
 
-   static final String BPN_RULE_NAME = "bpn";
-   static final String MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME = "mandatorySpecificAssetIds";
-   static final String VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME = "visibleSpecificAssetIdNames";
-   static final String VISIBLE_SEMANTIC_IDS_RULE_NAME = "visibleSemanticIds";
+   public static final String BPN_RULE_NAME = "bpn";
+   public static final String MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME = "mandatorySpecificAssetIds";
+   public static final String VISIBLE_SPECIFIC_ASSET_ID_NAMES_RULE_NAME = "visibleSpecificAssetIdNames";
+   public static final String VISIBLE_SEMANTIC_IDS_RULE_NAME = "visibleSemanticIds";
 
+   @Valid
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
+   @Size(min = 4, groups = { OnCreate.class, OnUpdate.class } )
    @JsonProperty( "accessRules" )
    private Set<AccessRulePolicyValue> accessRules;
 
    @JsonIgnore
+   @Valid
+   @Size(min = 1, groups = { OnCreate.class, OnUpdate.class } )
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
    public Set<SpecificAssetId> getMandatorySpecificAssetIds() {
       return accessRules.stream().filter( rule -> MANDATORY_SPECIFIC_ASSET_IDS_RULE_NAME.equals( rule.attribute() ) )
             .flatMap( rule -> {
@@ -67,6 +79,8 @@ public class AccessRulePolicy {
    }
 
    @JsonIgnore
+   @NotNull( groups = { OnCreate.class, OnUpdate.class } )
+   @NotBlank( groups = { OnCreate.class, OnUpdate.class } )
    public String getBpn() {
       return getStringValueOfRule( BPN_RULE_NAME );
    }

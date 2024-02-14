@@ -17,39 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  ******************************************************************************/
-package org.eclipse.tractusx.semantics.accesscontrol.sql.model.policy;
+package org.eclipse.tractusx.semantics.accesscontrol.sql.validation;
 
-import java.util.Arrays;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
-
-public enum PolicyOperator {
-
-   EQUALS( "eq", true ),
-   INCLUDES("includes", false );
-
-   private final String value;
-   private final boolean singleValued;
-
-   PolicyOperator( String value, boolean singleValued ) {
-      this.value = value;
-      this.singleValued = singleValued;
-   }
-
-   @JsonCreator
-   public static PolicyOperator forValue( final String value ) {
-      return Arrays.stream( PolicyOperator.values() ).filter( o -> o.getValue().equals( value ) ).findFirst().orElse( null );
-   }
-
-   @JsonValue
-   public String getValue() {
-      return value;
-   }
-
-   @JsonIgnore
-   public boolean isSingleValued() {
-      return singleValued;
-   }
+public interface OnCreate {
 }

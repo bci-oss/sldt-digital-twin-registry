@@ -19,20 +19,22 @@
  ******************************************************************************/
 package org.eclipse.tractusx.semantics.registry;
 
-import static org.eclipse.tractusx.semantics.registry.TestUtil.getEncodedValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.tractusx.semantics.RegistryProperties;
 import org.eclipse.tractusx.semantics.aas.registry.model.AssetAdministrationShellDescriptor;
 import org.eclipse.tractusx.semantics.aas.registry.model.SpecificAssetId;
-import org.eclipse.tractusx.semantics.aas.registry.model.SubmodelDescriptor;
+import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.AccessControlRuleRepository;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,8 +49,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @EnableConfigurationProperties( RegistryProperties.class )
 public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdministrationShellApiSecurityTest {
 
-   private static final String HTTP_EDC_DATA_PLANE_URL = "{\"submodelEndpointUrl\": \"http://edc-data-plane/url\"}";
-   private static final String EXISTING_URL = "{\"submodelEndpointUrl\": \"http://endpoint-address\"}";
+   private static final String HTTP_EDC_DATA_PLANE_URL_REQUEST = "{\"submodelEndpointUrl\": \"http://edc-data-plane/url\"}";
+   private static final String EXISTING_URL = "http://endpoint-address";
+   private static final String EXISTING_URL_REQUEST_FORMAT = "{\"submodelEndpointUrl\": \"%s\"}";
 
    @Nested
    @DisplayName( "Authentication Tests" )
@@ -170,7 +173,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       }
 
       @Test
-      @Disabled( "Don't have /fetch" )
+      @Disabled("Don't have /fetch")
       public void testRbacForFetchShellsByIds() throws Exception {
          super.testRbacForFetchShellsByIds();
       }
@@ -180,6 +183,9 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
    @DisplayName( "Tenant based specificAssetId visibility test" )
    class TenantBasedVisibilityTest extends AssetAdministrationShellApiSecurityTest.TenantBasedVisibilityTest {
 
+      @Autowired
+      private AccessControlRuleRepository accessControlRuleRepository;
+
       @Test
       public void testGetAllShellsWithDefaultClosedFilteredSpecificAssetIdsByTenantId() throws Exception {
          super.testGetAllShellsWithDefaultClosedFilteredSpecificAssetIdsByTenantId();
@@ -187,6 +193,17 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       public void testGetShellWithFilteredSpecificAssetIdsByTenantId() throws Exception {
+         accessControlRuleRepository.saveAllAndFlush( List.of(
+               TestUtil.createAccessRule( TestUtil.PUBLIC_READABLE,
+                     Map.of( keyPrefix + "BPID", "ignoreWildcard", "manufacturerPartId", keyPrefix + "wildcardAllowed" ),
+                     Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule( jwtTokenFactory.tenantTwo().getTenantId(),
+                     Map.of( keyPrefix + "CustomerPartId", "tenantTwoAssetIdValue", keyPrefix + "MaterialNumber", "withoutTenantAssetIdValue" ),
+                     Set.of( keyPrefix + "CustomerPartId", keyPrefix + "MaterialNumber" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule( jwtTokenFactory.tenantThree().getTenantId(),
+                     Map.of( keyPrefix + "CustomerPartId2", "tenantThreeAssetIdValue" ),
+                     Set.of( keyPrefix + "CustomerPartId2" ), Set.of( keyPrefix + "semanticId" ) )
+         ) );
          super.testGetShellWithFilteredSpecificAssetIdsByTenantId();
       }
 
@@ -208,6 +225,17 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       public void testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess() throws Exception {
+         accessControlRuleRepository.saveAllAndFlush( List.of(
+               TestUtil.createAccessRule( TestUtil.PUBLIC_READABLE,
+                     Map.of( keyPrefix + "bpId", "value_3", "manufacturerPartId", keyPrefix + "value_2" ),
+                     Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule( jwtTokenFactory.tenantTwo().getTenantId(),
+                     Map.of( keyPrefix + "tenantTwo_tenantThree", "value_3", keyPrefix + "tenantTwo", "value_2_private"),
+                     Set.of( keyPrefix + "tenantTwo_tenantThree", keyPrefix + "tenantTwo" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule( jwtTokenFactory.tenantThree().getTenantId(),
+                     Map.of( keyPrefix + "tenantTwo_tenantThree", "value_3" ),
+                     Set.of( keyPrefix + "tenantTwo_tenantThree" ), Set.of( keyPrefix + "semanticId" ) )
+         ) );
          super.testFindExternalShellIdsBySpecificAssetIdsWithTenantBasedVisibilityAndWildcardExpectSuccess();
       }
 
@@ -221,6 +249,9 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
    @DisplayName( "Tenant based Shell visibility test" )
    class TenantBasedShellVisibilityTest extends AssetAdministrationShellApiSecurityTest.TenantBasedShellVisibilityTest {
 
+      @Autowired
+      private AccessControlRuleRepository accessControlRuleRepository;
+
       @Test
       public void testGetAllShellsByOwningTenantId() throws Exception {
          super.testGetAllShellsByOwningTenantId();
@@ -228,6 +259,14 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       public void testGetAllShellsWithPublicAccessByTenantId() throws Exception {
+         accessControlRuleRepository.saveAllAndFlush( List.of(
+               TestUtil.createAccessRule( TestUtil.PUBLIC_READABLE,
+                     Map.of( "manufacturerPartId", keyPrefix + "value_2" ),
+                     Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule( jwtTokenFactory.tenantTwo().getTenantId(),
+                     Map.of( keyPrefix + "tenantTwo", "value_2_public" ),
+                     Set.of( keyPrefix + "tenantTwo" ), Set.of( keyPrefix + "semanticId" ) )
+         ) );
          super.testGetAllShellsWithPublicAccessByTenantId();
       }
 
@@ -238,6 +277,14 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       public void testGetAllShellByExternalIdWithPublicAccessByTenantId() throws Exception {
+         accessControlRuleRepository.saveAllAndFlush( List.of(
+               TestUtil.createAccessRule( TestUtil.PUBLIC_READABLE,
+                     Map.of( "manufacturerPartId", keyPrefix + "value_2" ),
+                     Set.of( "manufacturerPartId" ), Set.of( keyPrefix + "semanticId" ) ),
+               TestUtil.createAccessRule( jwtTokenFactory.tenantTwo().getTenantId(),
+                     Map.of( keyPrefix + "tenantTwo", "value_2_public" ),
+                     Set.of( keyPrefix + "tenantTwo" ), Set.of() )
+         ) );
          super.testGetAllShellByExternalIdWithPublicAccessByTenantId();
       }
    }
@@ -271,13 +318,16 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
    @DisplayName( "Submodel endpoint authorization Tests" )
    class SubmodelEndpointAuthorizationApiTest {
 
+      @Autowired
+      private AccessControlRuleRepository accessControlRuleRepository;
+
       @Test
       void testPostSubmodelDescriptorAuthorizedWithoutTokenExpectForbidden() throws Exception {
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( "/api/v3.0/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
-                           .content( HTTP_EDC_DATA_PLANE_URL )
+                           .content( HTTP_EDC_DATA_PLANE_URL_REQUEST )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -291,7 +341,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
                            .post( "/api/v3.0/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.readTwin() )
-                           .content( HTTP_EDC_DATA_PLANE_URL )
+                           .content( HTTP_EDC_DATA_PLANE_URL_REQUEST )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -318,7 +368,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
                            .post( "/api/v3.0/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantOne().submodelAccessControl() )
-                           .content( HTTP_EDC_DATA_PLANE_URL )
+                           .content( HTTP_EDC_DATA_PLANE_URL_REQUEST )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isForbidden() );
@@ -331,7 +381,7 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
                            .post( "/api/v3.0/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantOne().submodelAccessControl() )
-                           .content( HTTP_EDC_DATA_PLANE_URL )
+                           .content( HTTP_EDC_DATA_PLANE_URL_REQUEST )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantOne().getTenantId() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -339,22 +389,33 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
       }
 
       @Test
-      @Disabled( "disabled while we have no way to create dynamic rules" )
       void testPostSubmodelDescriptorAuthorizedWithoutMatchingSemanticIdExpectForbidden() throws Exception {
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor( UUID.randomUUID().toString(), "http://endpoint-address" );
-         shellPayload.setId( UUID.randomUUID().toString() );
+         String randomId = UUID.randomUUID().toString();
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( randomId + "semanticIdExample", EXISTING_URL + randomId );
+         shellPayload.setSpecificAssetIds( null );
+         shellPayload.setId( randomId );
 
-         SpecificAssetId asset = TestUtil.createSpecificAssetId( "tenantTwo", "value_2_private", List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         String tenantTwoBpn = jwtTokenFactory.tenantTwo().getTenantId();
+         SpecificAssetId asset = TestUtil.createSpecificAssetId( randomId + "tenantTwo", randomId + "value_2", List.of( tenantTwoBpn ) );
          shellPayload.setSpecificAssetIds( List.of( asset ) );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
-         //Tenant two should not have access due to the random specificAssetId
+         final var accessRule = TestUtil.createAccessRule(
+               tenantTwoBpn,
+               Map.of( randomId + "tenantTwo", randomId + "value_2" ),
+               Set.of( randomId + "tenantTwo" ),
+               Set.of()
+         );
+         accessControlRuleRepository.saveAndFlush( accessRule );
+
+         //Tenant two should not have access because the rule does not give access to any semanticIds
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( "/api/v3.0/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantTwo().submodelAccessControl() )
-                           .content( EXISTING_URL )
+                           .content( getRequestForUrl( EXISTING_URL + randomId ) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
                )
                .andDo( MockMvcResultHandlers.print() )
@@ -363,55 +424,74 @@ public class GranularAssetAdministrationShellApiSecurityTest extends AssetAdmini
 
       @Test
       void testPostSubmodelDescriptorAuthorizedWithMatchingShellAndSemanticIdExpectSuccess() throws Exception {
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         String randomId = UUID.randomUUID().toString();
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( randomId + "semanticIdExample", EXISTING_URL + randomId );
          shellPayload.setSpecificAssetIds( null );
-         shellPayload.setId( UUID.randomUUID().toString() );
+         shellPayload.setId( randomId );
 
-         SpecificAssetId asset = TestUtil.createSpecificAssetId( "tenantTwo", "value_2_private", List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         String tenantTwoBpn = jwtTokenFactory.tenantTwo().getTenantId();
+         SpecificAssetId asset = TestUtil.createSpecificAssetId( randomId + "tenantTwo", randomId + "value_2", List.of( tenantTwoBpn ) );
          shellPayload.setSpecificAssetIds( List.of( asset ) );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
-         SubmodelDescriptor submodel = TestUtil.createSubmodel();
-         performSubmodelCreateRequest( mapper.writeValueAsString( submodel ), getEncodedValue( shellPayload.getId() ) );
+         final var accessRule = TestUtil.createAccessRule(
+               tenantTwoBpn,
+               Map.of( randomId + "tenantTwo", randomId + "value_2" ),
+               Set.of( randomId + "tenantTwo" ),
+               Set.of( randomId + "semanticIdExample" )
+         );
+         accessControlRuleRepository.saveAndFlush( accessRule );
 
-         //Tenant two should have access due to the default semantic Id value
+         //Tenant two should have access due to the matching shell and semantic Id values
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( "/api/v3.0/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantTwo().submodelAccessControl() )
-                           .content( EXISTING_URL )
-                           .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantTwo().getTenantId() )
+                           .content( getRequestForUrl( EXISTING_URL + randomId ) )
+                           .header( EXTERNAL_SUBJECT_ID_HEADER, tenantTwoBpn )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isOk() );
       }
 
       @Test
-      @Disabled( "disabled while we have no way to create dynamic rules" )
       void testPostSubmodelDescriptorAuthorizedWithoutMatchingShellExpectForbidden() throws Exception {
-         AssetAdministrationShellDescriptor shellPayload = TestUtil.createCompleteAasDescriptor();
+         String randomId = UUID.randomUUID().toString();
+         AssetAdministrationShellDescriptor shellPayload = TestUtil
+               .createCompleteAasDescriptor( randomId + "semanticIdExample", EXISTING_URL + randomId );
          shellPayload.setSpecificAssetIds( null );
-         shellPayload.setId( UUID.randomUUID().toString() );
+         shellPayload.setId( randomId );
 
-         SpecificAssetId asset = TestUtil.createSpecificAssetId( "tenantTwo", "value_2_private", List.of( jwtTokenFactory.tenantTwo().getTenantId() ) );
+         String tenantTwoBpn = jwtTokenFactory.tenantTwo().getTenantId();
+         SpecificAssetId asset = TestUtil.createSpecificAssetId( randomId + "tenantTwo", randomId + "value_2", List.of( tenantTwoBpn ) );
          shellPayload.setSpecificAssetIds( List.of( asset ) );
          performShellCreateRequest( mapper.writeValueAsString( shellPayload ) );
 
-         SubmodelDescriptor submodel = TestUtil.createSubmodel();
-         performSubmodelCreateRequest( mapper.writeValueAsString( submodel ), getEncodedValue( shellPayload.getId() ) );
+         final var accessRule = TestUtil.createAccessRule(
+               tenantTwoBpn,
+               Map.of( randomId + "tenantTwo", randomId + "value_2" ),
+               Set.of( randomId + "tenantTwo" ),
+               Set.of( randomId + "semanticIdExample" )
+         );
+         accessControlRuleRepository.saveAndFlush( accessRule );
 
-         //Tenant three should have access due to the non-visible shell
+         //Tenant three should have access due to the non-visible shell (as it is only visible to tenantTwo
          mvc.perform(
                      MockMvcRequestBuilders
                            .post( "/api/v3.0/submodel-descriptor/authorized" )
                            .contentType( MediaType.APPLICATION_JSON )
                            .with( jwtTokenFactory.tenantThree().submodelAccessControl() )
-                           .content( EXISTING_URL )
+                           .content( getRequestForUrl( EXISTING_URL + randomId ) )
                            .header( EXTERNAL_SUBJECT_ID_HEADER, jwtTokenFactory.tenantThree().getTenantId() )
                )
                .andDo( MockMvcResultHandlers.print() )
                .andExpect( status().isForbidden() );
       }
+   }
+
+   private static String getRequestForUrl( String url ) {
+      return String.format( EXISTING_URL_REQUEST_FORMAT, url );
    }
 }

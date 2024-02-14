@@ -20,6 +20,7 @@
 
 package org.eclipse.tractusx.semantics.accesscontrol.sql.service;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +38,12 @@ import org.eclipse.tractusx.semantics.accesscontrol.api.model.SpecificAssetId;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRule;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.model.AccessRulePolicy;
 import org.eclipse.tractusx.semantics.accesscontrol.sql.repository.AccessControlRuleRepository;
+import org.springframework.dao.DataAccessException;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class SqlBackedAccessControlRuleService implements AccessControlRuleService {
 
    private final AccessControlRuleRepository repository;
@@ -97,11 +101,16 @@ public class SqlBackedAccessControlRuleService implements AccessControlRuleServi
    }
 
    private Stream<AccessRulePolicy> findPotentiallyMatchingAccessControlRules( String bpn ) throws DenyAccessException {
-      List<AccessRule> allByBpn = repository.findAllByBpnWithinValidityPeriod( bpn, bpnWildcard );
-      if ( allByBpn == null || allByBpn.isEmpty() ) {
+      try {
+         List<AccessRule> allByBpn = repository.findAllByBpnWithinValidityPeriod( bpn, bpnWildcard, Instant.now() );
+         if ( allByBpn == null || allByBpn.isEmpty() ) {
+            throw new DenyAccessException( "No matching rules are found." );
+         }
+         return allByBpn.stream().map( AccessRule::getPolicy ).filter( policy -> !policy.getMandatorySpecificAssetIds().isEmpty() );
+      } catch ( DataAccessException e ) {
+         log.error( "Failed to fetch rules for BPN: " + bpn, e.getMessage() );
          throw new DenyAccessException( "No matching rules are found." );
       }
-      return allByBpn.stream().map( AccessRule::getPolicy );
    }
 
    private Set<AccessRulePolicy> findMatchingAccessControlRules( ShellVisibilityContext shellContext, String bpn ) throws DenyAccessException {
