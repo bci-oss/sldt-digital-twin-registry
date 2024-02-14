@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @EnableConfigurationProperties( RegistryProperties.class)
-public abstract class AbstractAssetAdministrationShellApi {
+public abstract class AbstractAssetAdministrationShellApi extends PostgresTestContainer {
 
     protected static final String SHELL_BASE_PATH = "/api/v3.0/shell-descriptors";
     protected static final String SINGLE_SHELL_BASE_PATH = "/api/v3.0/shell-descriptors/{aasIdentifier}";

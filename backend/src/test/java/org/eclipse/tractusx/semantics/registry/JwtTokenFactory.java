@@ -36,7 +36,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import lombok.Value;
 import net.minidev.json.JSONArray;
 
-public class JwtTokenFactory {
+public class JwtTokenFactory  {
 
    private static final String TENANT_ONE = "TENANT_ONE";
    private static final String TENANT_TWO = "TENANT_TWO";
