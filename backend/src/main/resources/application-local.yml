@@ -27,6 +27,11 @@ spring:
       resourceserver:
         jwt:
           issuer-uri:
+  datasource:
+    driverClassName: org.h2.Driver
+    password: tractusx
+    username: tractusx
+    url: jdbc:h2:file:./persistence/registrydb;CASE_INSENSITIVE_IDENTIFIERS=TRUE
 
   # Properties develop against a postgres instance
   # You can start a postgres instance using the docker-compose file located in the backend/postgres/ directory
