@@ -35,7 +35,7 @@ USER 100:101
 
 WORKDIR /service
 
-COPY --from=builder /build/backend/target/digital-twin-registry-backend*.jar app.jar
+COPY --from=builder /build/backend/core/target/digital-twin-registry-backend*.jar app.jar
 
 COPY backend/Dockerfile *legal /legal/
 

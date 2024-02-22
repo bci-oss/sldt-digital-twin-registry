@@ -104,9 +104,8 @@
 	</properties>
 
 	<modules>
-		<module>backend</module>
+			<module>backend</module>
         <module>access-control-service-interface</module>
-        <module>access-control-service-sql-impl</module>
         <!-- more modules are expected to come -->
     </modules>
 

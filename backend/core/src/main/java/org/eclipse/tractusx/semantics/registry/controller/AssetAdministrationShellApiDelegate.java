@@ -22,7 +22,6 @@ package org.eclipse.tractusx.semantics.registry.controller;
 
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
