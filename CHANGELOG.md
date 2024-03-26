@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 ## fixed
 - KICS findings fixed
-
+- Fixed behaviour of access rule management in case of multiple specificAssetIds with same keys and different values.
+- Update Springboot to version 3.2.4
 
 ## 0.4.1
 ### Added
