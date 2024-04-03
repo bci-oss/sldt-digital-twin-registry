@@ -26,5 +26,6 @@ import java.util.Set;
 import lombok.NonNull;
 
 public record ShellVisibilityCriteria(
-      @NonNull String aasId, @NonNull Map<String, Set<String>> visibleSpecificAssetIdNames, @NonNull Set<String> visibleSemanticIds, boolean publicOnly) {
+      @NonNull String aasId, @NonNull Set<String> visibleSpecificAssetIdNamesRegardlessOfValues,
+      @NonNull Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues, @NonNull Set<String> visibleSemanticIds, boolean publicOnly) {
 }

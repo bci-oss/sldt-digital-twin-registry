@@ -36,33 +36,39 @@ class ShellVisibilityCriteriaTest {
 
    public static Stream<Arguments> nullProvider() {
       return Stream.<Arguments> builder()
-            .add( Arguments.of( null, null, null, true ) )
-            .add( Arguments.of( UUID.randomUUID().toString(), null, null, true ) )
-            .add( Arguments.of( null, Map.of(), null, false ) )
-            .add( Arguments.of( null, null, Set.of(), false ) )
+            .add( Arguments.of( null, null, null, null, true ) )
+            .add( Arguments.of( UUID.randomUUID().toString(), null, null, null, true ) )
+            .add( Arguments.of( null, Set.of(), null, null, false ) )
+            .add( Arguments.of( null, null, Map.of(), null, false ) )
+            .add( Arguments.of( null, null, null, Set.of(), false ) )
             .build();
    }
 
    @ParameterizedTest
    @MethodSource( "nullProvider" )
    void testConstructorCalledWithNullExpectException(
-         String aasId, Map<String, Set<String>> visibleSpecificAssetIdNames, Set<String> visibleSemanticIds, boolean publicOnly ) {
-      assertThatThrownBy( () -> new ShellVisibilityCriteria( aasId, visibleSpecificAssetIdNames, visibleSemanticIds, publicOnly ) )
-            .isExactlyInstanceOf( NullPointerException.class );
+         String aasId, Set<String> visibleSpecificAssetIdNamesRegardlessOfValues,
+         Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues, Set<String> visibleSemanticIds, boolean publicOnly ) {
+      assertThatThrownBy( () -> new ShellVisibilityCriteria(
+            aasId, visibleSpecificAssetIdNamesRegardlessOfValues, visibleSpecificAssetIdWhenMatchingValues, visibleSemanticIds, publicOnly )
+      ).isExactlyInstanceOf( NullPointerException.class );
    }
 
    @Test
    void testConstructorCalledWithValidDataExpectSuccess() {
       final String aasId = UUID.randomUUID().toString();
 
-      final Map<String, Set<String>> visibleSpecificAssetIdNames = Map.of( "name1", Set.of( "" ) );
+      final Set<String> visibleSpecificAssetIdNamesRegardlessOfValues = Set.of( "name0" );
+      final Map<String, Set<String>> visibleSpecificAssetIdWhenMatchingValues = Map.of( "name1", Set.of( "value1" ) );
       final Set<String> visibleSemanticIds = Set.of( "name2" );
       final boolean publicOnly = true;
 
-      ShellVisibilityCriteria actual = new ShellVisibilityCriteria( aasId, visibleSpecificAssetIdNames, visibleSemanticIds, publicOnly );
+      ShellVisibilityCriteria actual = new ShellVisibilityCriteria(
+            aasId, visibleSpecificAssetIdNamesRegardlessOfValues,visibleSpecificAssetIdWhenMatchingValues, visibleSemanticIds, publicOnly );
 
       assertThat( actual.aasId() ).isEqualTo( aasId );
-      assertThat( actual.visibleSpecificAssetIdNames() ).isEqualTo( visibleSpecificAssetIdNames );
+      assertThat( actual.visibleSpecificAssetIdNamesRegardlessOfValues() ).isEqualTo( visibleSpecificAssetIdNamesRegardlessOfValues );
+      assertThat( actual.visibleSpecificAssetIdWhenMatchingValues() ).isEqualTo( visibleSpecificAssetIdWhenMatchingValues );
       assertThat( actual.visibleSemanticIds() ).isEqualTo( visibleSemanticIds );
       assertThat( actual.publicOnly() ).isEqualTo( publicOnly );
    }

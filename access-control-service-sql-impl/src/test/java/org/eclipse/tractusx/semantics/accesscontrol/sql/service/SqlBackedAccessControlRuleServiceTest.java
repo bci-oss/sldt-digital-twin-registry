@@ -190,6 +190,6 @@ class SqlBackedAccessControlRuleServiceTest {
       final var actual = underTest.fetchVisibilityCriteriaForShell( shellContext, bpn );
 
       assertThat( actual.visibleSemanticIds() ).isEqualTo( expectedSemanticIds );
-      assertThat( actual.visibleSpecificAssetIdNames() ).isEqualTo( expectedSpecificAssetIdNames );
+      assertThat( actual.visibleSpecificAssetIdNamesRegardlessOfValues() ).isEqualTo( expectedSpecificAssetIdNames );
    }
 }
