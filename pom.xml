@@ -96,7 +96,7 @@
 		<liquibase.version>4.19.1</liquibase.version>
 
 		<!-- EDC -->
-		<edc.version>0.6.0</edc.version>
+		<edc.version>0.6.1-20240406-SNAPSHOT</edc.version>
 
 		<!-- test libs -->
 		<assertj.version>3.24.2</assertj.version>
@@ -478,6 +478,11 @@
 			<id>Maven Central</id>
 			<name>maven-central</name>
 			<url>https://repo1.maven.org/maven2/</url>
+		</repository>
+		<repository>
+			<id>Maven Central Snapshots</id>
+			<name>maven-snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</repository>
 	</repositories>
 

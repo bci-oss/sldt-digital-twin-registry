@@ -190,14 +190,18 @@ secret will be required during the configuration.
 ### Extension configuration
 
 ```properties
-# Configure the URL which is used when the clients are reaching the EDC Data Plane's /public/v2/ endpoint 
-edc.granular.access.verification.edc.data.plane.baseUrl=http://edc-data-plane:9051/public/v2/
+# 
+# Please make sure to configure the "web.http.public.path" setting as well in order to let this extension work properly!
+#
+
+# Configure the URL which is used when the clients are reaching the EDC Data Plane's /public/ endpoint 
+edc.granular.access.verification.edc.data.plane.baseUrl=http://edc-data-plane:9051/public/
 
 # List the names of each DTR instance we intend to configure (comma separated list)
 edc.granular.access.verification.dtr.names=default
 
 # Configure each DTR instance using the following properties.
-# "use the edc.granular.access.verification.dtr.config.<dtr_name>." prefix with each name listed above
+# Use the "edc.granular.access.verification.dtr.config.<dtr_name>." prefix with each name listed above
 
 # How long should we cache the response we have received from DTR?
 edc.granular.access.verification.dtr.config.default.dtr.decision.cache.duration.minutes=1

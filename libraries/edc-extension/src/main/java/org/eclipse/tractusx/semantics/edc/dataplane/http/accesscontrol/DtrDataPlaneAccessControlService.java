@@ -67,7 +67,7 @@ public class DtrDataPlaneAccessControlService implements DataPlaneAccessControlS
          return Result.success();
       }
       final var requestUri = uriRoutingContext.getRequestUri();
-      final var path = requestUri.getPath().replaceFirst( "^/public/v2/", "" );
+      final var path = requestUri.getPath().replaceFirst( "^" + config.getEdcDataPlanePublicEndpointPath(), "" );
       final var queryString = requestUri.getQuery();
       final Optional<String> baseUrlNoTrailingSlash = Optional.ofNullable( address.getStringProperty( ADDRESS_ASSET_BASE_URL ) )
             .map( url -> url.replaceFirst( "/$", "" ) );

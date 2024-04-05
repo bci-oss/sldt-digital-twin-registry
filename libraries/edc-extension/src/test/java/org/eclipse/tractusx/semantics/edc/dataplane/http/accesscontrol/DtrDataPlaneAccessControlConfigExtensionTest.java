@@ -24,8 +24,8 @@ import static org.eclipse.tractusx.semantics.edc.dataplane.http.accesscontrol.Dt
 import static org.mockito.Mockito.*;
 
 import org.assertj.core.api.Assertions;
+import org.eclipse.edc.http.spi.EdcHttpClient;
 import org.eclipse.edc.junit.extensions.DependencyInjectionExtension;
-import org.eclipse.edc.spi.http.EdcHttpClient;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.security.Vault;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;

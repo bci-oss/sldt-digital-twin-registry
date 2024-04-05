@@ -64,14 +64,14 @@ class DtrDataPlaneAccessControlServiceTest {
                   "api/submodel-resource",
                   "param1=value1",
                   "http://backend.example.com/api/submodel-resource",
-                  "http://edc.example.com/public/v2/api/submodel-resource?param1=value1"
+                  "http://edc.example.com/public/api/submodel-resource?param1=value1"
             ) )
             .add( Arguments.of(
                   "http://backend.example.com/",
                   "api/submodel-resource",
                   "param1=value1",
                   "http://backend.example.com/api/submodel-resource",
-                  "http://edc.example.com/public/v2/api/submodel-resource?param1=value1"
+                  "http://edc.example.com/public/api/submodel-resource?param1=value1"
             ) )
             .build();
    }
@@ -79,6 +79,7 @@ class DtrDataPlaneAccessControlServiceTest {
    @BeforeEach
    void initMocks() {
       when( config.getEdcDataPlaneBaseUrl() ).thenReturn( "http://edc.example.com/" );
+      when( config.getEdcDataPlanePublicEndpointPath() ).thenReturn( "/public/" );
       when( dtrConfig.getAspectModelUrlPattern() ).thenReturn( "http:\\/\\/backend\\.example\\.com\\/api\\/.*" );
       when( config.getDtrClientConfigMap() ).thenReturn( Map.of( "0", dtrConfig ) );
 
@@ -93,7 +94,7 @@ class DtrDataPlaneAccessControlServiceTest {
       when( address.getStringProperty( ADDRESS_ASSET_BASE_URL ) ).thenReturn( "http://dtr.example.com" );
       when( address.getStringProperty( ADDRESS_HEADER_EDC_BPN ) ).thenReturn( BPN_0001 );
       when( client.isAspectModelCall( anyString() ) ).thenReturn( false );
-      when( uriInfo.getRequestUri() ).thenReturn( URI.create( "http://edc.example.com/public/v2/api/dtr/resource?param1=value1" ) );
+      when( uriInfo.getRequestUri() ).thenReturn( URI.create( "http://edc.example.com/public/api/dtr/resource?param1=value1" ) );
 
       //when
       final Result<Void> actual = underTest.checkAccess( claimToken, address, additionalData, requestData );
@@ -112,7 +113,7 @@ class DtrDataPlaneAccessControlServiceTest {
       when( address.getStringProperty( ADDRESS_ASSET_BASE_URL ) ).thenReturn( "http://dtr.example.com" );
       when( address.getStringProperty( ADDRESS_HEADER_EDC_BPN ) ).thenReturn( null );
       when( client.isAspectModelCall( anyString() ) ).thenReturn( false );
-      when( uriInfo.getRequestUri() ).thenReturn( URI.create( "http://edc.example.com/public/v2/api/dtr/resource?param1=value1" ) );
+      when( uriInfo.getRequestUri() ).thenReturn( URI.create( "http://edc.example.com/public/api/dtr/resource?param1=value1" ) );
 
       //when
       final Result<Void> actual = underTest.checkAccess( claimToken, address, additionalData, requestData );

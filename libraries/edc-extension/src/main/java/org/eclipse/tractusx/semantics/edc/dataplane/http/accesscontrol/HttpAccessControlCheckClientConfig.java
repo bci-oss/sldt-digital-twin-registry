@@ -34,6 +34,7 @@ public class HttpAccessControlCheckClientConfig {
 
    private final Map<String, HttpAccessControlCheckDtrClientConfig> dtrClientConfigMap;
    private final String edcDataPlaneBaseUrl;
+   private String edcDataPlanePublicEndpointPath;
 
    public HttpAccessControlCheckClientConfig( final ServiceExtensionContext context ) {
       dtrClientConfigMap = Arrays.stream( context.getSetting( EDC_DTR_CONFIG_NAMES, "" ).split( "," ) )
@@ -42,6 +43,7 @@ public class HttpAccessControlCheckClientConfig {
                   name -> new HttpAccessControlCheckDtrClientConfig(
                         context.getConfig( EDC_DTR_CONFIG_PREFIX + name ) ) ) );
       edcDataPlaneBaseUrl = context.getSetting( EDC_DATA_PLANE_BASE_URL, null );
+      edcDataPlanePublicEndpointPath = context.getSetting( "web.http.public.path", "/api/public" );
    }
 
    public Map<String, HttpAccessControlCheckDtrClientConfig> getDtrClientConfigMap() {
@@ -50,5 +52,13 @@ public class HttpAccessControlCheckClientConfig {
 
    public String getEdcDataPlaneBaseUrl() {
       return edcDataPlaneBaseUrl;
+   }
+
+   public String getEdcDataPlanePublicEndpointPath() {
+      return edcDataPlanePublicEndpointPath;
+   }
+
+   public void setEdcDataPlanePublicEndpointPath( String edcDataPlanePublicEndpointPath ) {
+      this.edcDataPlanePublicEndpointPath = edcDataPlanePublicEndpointPath;
    }
 }
